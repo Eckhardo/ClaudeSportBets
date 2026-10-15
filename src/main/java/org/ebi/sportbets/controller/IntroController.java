@@ -1,4 +1,4 @@
-package org.ebi.sportbets.claudesportbets.web.controller;
+package org.ebi.sportbets.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
