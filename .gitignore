@@ -31,6 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+.history/
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
 
 ### Maven ###
 pom.xml.tag
@@ -54,11 +58,18 @@ http-client.private.env.json
 logs/
 application-local.properties
 application-local.yml
+application-local.yaml
 .env
+.env.*
+!.env.example
+.attach_pid*
 
 ### MySQL ###
 /*.sql
 *.dump
+*.sql.gz
+.my.cnf
+.mylogin.cnf
 /db-dumps/
 mysql-data/
 
