@@ -74,8 +74,8 @@ application-local.yaml
 mysql-data/
 
 ### Claude Code ###
-.claude/settings.local.json
-.claude/worktrees/
+.claudePiomin/settings.local.json
+.claudePiomin/worktrees/
 CLAUDE.local.md
 
 ### OS ###
