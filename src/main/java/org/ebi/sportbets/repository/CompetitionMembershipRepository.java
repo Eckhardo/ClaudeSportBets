@@ -15,4 +15,6 @@ public interface CompetitionMembershipRepository extends JpaRepository<Competiti
     Optional<CompetitionMembership> findByCommunityIdAndCompetitionId(Long communityId, Long competitionId);
 
     boolean existsByCommunityIdAndCompetitionId(Long communityId, Long competitionId);
+
+    boolean existsByCompetitionId(Long competitionId);
 }

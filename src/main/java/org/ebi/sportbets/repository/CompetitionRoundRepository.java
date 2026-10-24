@@ -11,4 +11,6 @@ public interface CompetitionRoundRepository extends JpaRepository<CompetitionRou
     List<CompetitionRound> findByCompetitionIdOrderByRoundNumberAsc(Long competitionId);
 
     Optional<CompetitionRound> findByCompetitionIdAndRoundNumber(Long competitionId, int roundNumber);
+
+    boolean existsByCompetitionId(Long competitionId);
 }

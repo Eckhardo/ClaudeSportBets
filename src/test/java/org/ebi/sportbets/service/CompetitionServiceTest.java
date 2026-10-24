@@ -3,9 +3,14 @@ package org.ebi.sportbets.service;
 import org.ebi.sportbets.dto.CompetitionDto;
 import org.ebi.sportbets.entity.Competition;
 import org.ebi.sportbets.entity.CompetitionFamily;
+import org.ebi.sportbets.exception.BusinessRuleException;
 import org.ebi.sportbets.exception.ResourceNotFoundException;
 import org.ebi.sportbets.repository.CompetitionFamilyRepository;
+import org.ebi.sportbets.repository.CompetitionMembershipRepository;
 import org.ebi.sportbets.repository.CompetitionRepository;
+import org.ebi.sportbets.repository.CompetitionRoleRepository;
+import org.ebi.sportbets.repository.CompetitionRoundRepository;
+import org.ebi.sportbets.repository.CompetitionTeamRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,6 +25,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
+import static org.mockito.Mockito.never;
 
 @ExtendWith(MockitoExtension.class)
 class CompetitionServiceTest {
@@ -30,8 +37,59 @@ class CompetitionServiceTest {
     @Mock
     private CompetitionFamilyRepository competitionFamilyRepository;
 
+    @Mock
+    private CompetitionRoundRepository competitionRoundRepository;
+
+    @Mock
+    private CompetitionTeamRepository competitionTeamRepository;
+
+    @Mock
+    private CompetitionMembershipRepository competitionMembershipRepository;
+
+    @Mock
+    private CompetitionRoleRepository competitionRoleRepository;
+
     @InjectMocks
     private CompetitionService competitionService;
+
+    @Test
+    void should_returnDto_when_competitionWithIdExists() {
+        // Arrange
+        Competition competition = Competition.builder()
+                .id(1L)
+                .name("Bundesliga 2026/27")
+                .winMultiplicator(3)
+                .remisMultiplicator(1)
+                .competitionFamily(CompetitionFamily.builder().id(7L).build())
+                .build();
+        given(competitionRepository.findById(1L)).willReturn(Optional.of(competition));
+
+        // Act
+        CompetitionDto result = competitionService.findById(1L);
+
+        // Assert
+        assertThat(result).isEqualTo(CompetitionDto.builder()
+                .id(1L)
+                .name("Bundesliga 2026/27")
+                .winMultiplicator(3)
+                .remisMultiplicator(1)
+                .competitionFamilyId(7L)
+                .build());
+    }
+
+    @Test
+    void should_throwResourceNotFound_when_competitionWithIdDoesNotExist() {
+        // Arrange
+        given(competitionRepository.findById(42L)).willReturn(Optional.empty());
+
+        // Act
+        Throwable thrown = catchThrowable(() -> competitionService.findById(42L));
+
+        // Assert
+        assertThat(thrown)
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Competition with id 42 not found");
+    }
 
     @Test
     void should_saveAndReturnCompetition_when_familyExists() {
@@ -62,6 +120,135 @@ class CompetitionServiceTest {
                 .remisMultiplicator(1)
                 .competitionFamilyId(7L)
                 .build());
+    }
+
+    @Test
+    void should_updateFieldsAndKeepIdAndCreatedOn_when_competitionExists() {
+        // Arrange
+        LocalDateTime createdOn = LocalDateTime.of(2026, 8, 1, 12, 0);
+        Competition existing = Competition.builder()
+                .id(1L)
+                .name("Old name")
+                .winMultiplicator(2)
+                .remisMultiplicator(1)
+                .competitionFamily(CompetitionFamily.builder().id(7L).build())
+                .createdOn(createdOn)
+                .build();
+        given(competitionRepository.findById(1L)).willReturn(Optional.of(existing));
+        given(competitionFamilyRepository.findById(8L)).willReturn(Optional.of(CompetitionFamily.builder().id(8L).build()));
+        CompetitionDto request = CompetitionDto.builder()
+                .id(99L)
+                .name("New name")
+                .description("Updated")
+                .winMultiplicator(3)
+                .remisMultiplicator(2)
+                .competitionFamilyId(8L)
+                .createdOn(LocalDateTime.of(2000, 1, 1, 0, 0))
+                .build();
+
+        // Act
+        CompetitionDto result = competitionService.update(1L, request);
+
+        // Assert
+        assertThat(result).isEqualTo(CompetitionDto.builder()
+                .id(1L)
+                .name("New name")
+                .description("Updated")
+                .winMultiplicator(3)
+                .remisMultiplicator(2)
+                .competitionFamilyId(8L)
+                .createdOn(createdOn)
+                .build());
+    }
+
+    @Test
+    void should_throwResourceNotFound_when_updatingUnknownCompetition() {
+        // Arrange
+        given(competitionRepository.findById(42L)).willReturn(Optional.empty());
+        CompetitionDto request = CompetitionDto.builder()
+                .name("New name")
+                .winMultiplicator(3)
+                .remisMultiplicator(1)
+                .competitionFamilyId(7L)
+                .build();
+
+        // Act
+        Throwable thrown = catchThrowable(() -> competitionService.update(42L, request));
+
+        // Assert
+        assertThat(thrown)
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Competition with id 42 not found");
+    }
+
+    @Test
+    void should_throwResourceNotFound_when_updatingWithUnknownFamily() {
+        // Arrange
+        Competition existing = Competition.builder()
+                .id(1L)
+                .competitionFamily(CompetitionFamily.builder().id(7L).build())
+                .build();
+        given(competitionRepository.findById(1L)).willReturn(Optional.of(existing));
+        given(competitionFamilyRepository.findById(8L)).willReturn(Optional.empty());
+        CompetitionDto request = CompetitionDto.builder()
+                .name("New name")
+                .winMultiplicator(3)
+                .remisMultiplicator(1)
+                .competitionFamilyId(8L)
+                .build();
+
+        // Act
+        Throwable thrown = catchThrowable(() -> competitionService.update(1L, request));
+
+        // Assert
+        assertThat(thrown)
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("CompetitionFamily with id 8 not found");
+    }
+
+    @Test
+    void should_throwBusinessRuleAndDeleteNothing_when_competitionHasDependents() {
+        // Arrange
+        given(competitionRepository.findById(1L)).willReturn(Optional.of(Competition.builder().id(1L).build()));
+        given(competitionRoundRepository.existsByCompetitionId(1L)).willReturn(true);
+        given(competitionTeamRepository.existsByCompetitionId(1L)).willReturn(true);
+
+        // Act
+        Throwable thrown = catchThrowable(() -> competitionService.delete(1L));
+
+        // Assert
+        assertThat(thrown)
+                .isInstanceOf(BusinessRuleException.class)
+                .hasMessage("Competition with id 1 cannot be deleted, it still has rounds, teams");
+        then(competitionRepository).should(never()).delete(any(Competition.class));
+    }
+
+    @Test
+    void should_deleteCompetition_when_competitionExists() {
+        // Arrange
+        Competition existing = Competition.builder().id(1L).build();
+        given(competitionRepository.findById(1L)).willReturn(Optional.of(existing));
+
+        // Act
+        competitionService.delete(1L);
+
+        // Assert
+        then(competitionRepository).should().delete(existing);
+    }
+
+    @Test
+    void should_throwResourceNotFoundAndDeleteNothing_when_deletingUnknownCompetition() {
+        // Arrange
+        given(competitionRepository.findById(42L)).willReturn(Optional.empty());
+
+        // Act
+        Throwable thrown = catchThrowable(() -> competitionService.delete(42L));
+
+        // Assert
+        assertThat(thrown)
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("Competition with id 42 not found");
+        then(competitionRepository).should(never()).delete(any(Competition.class));
     }
 
     @Test
