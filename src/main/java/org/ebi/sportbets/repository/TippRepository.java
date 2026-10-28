@@ -12,5 +12,7 @@ public interface TippRepository extends JpaRepository<Tipp, Long> {
 
     List<Tipp> findBySpielId(Long spielId);
 
+    List<Tipp> findByCommunityMembershipIdAndSpielId(Long communityMembershipId, Long spielId);
+
     Optional<Tipp> findByCommunityMembershipIdAndSpielIdAndTippModusId(Long communityMembershipId, Long spielId, Long tippModusId);
 }

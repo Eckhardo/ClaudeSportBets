@@ -10,11 +10,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.method.ParameterErrors;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.Instant;
@@ -71,6 +73,36 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .toList();
         return ResponseEntity.badRequest()
                 .body(errorBody(HttpStatus.BAD_REQUEST, "Validation failed", pathOf(request), fieldErrors));
+    }
+
+    /**
+     * Validation errors of list bodies such as {@code List<@Valid TippDto>}, which Spring reports via method
+     * validation instead of {@link MethodArgumentNotValidException}. Element errors are prefixed with their
+     * index, e.g. {@code [1].spielId}; errors on the parameter itself use the parameter name.
+     */
+    @Override
+    protected ResponseEntity<Object> handleHandlerMethodValidationException(
+            HandlerMethodValidationException ex, HttpHeaders headers,
+            HttpStatusCode status, WebRequest request) {
+        List<ErrorResponse.FieldErrorDto> fieldErrors = ex.getParameterValidationResults().stream()
+                .flatMap(result -> result instanceof ParameterErrors errors
+                        ? errors.getFieldErrors().stream().map(error -> ErrorResponse.FieldErrorDto.builder()
+                                .field(indexPrefix(errors) + error.getField())
+                                .rejectedValue(error.getRejectedValue())
+                                .message(error.getDefaultMessage())
+                                .build())
+                        : result.getResolvableErrors().stream().map(error -> ErrorResponse.FieldErrorDto.builder()
+                                .field(result.getMethodParameter().getParameterName())
+                                .rejectedValue(result.getArgument())
+                                .message(error.getDefaultMessage())
+                                .build()))
+                .toList();
+        return ResponseEntity.badRequest()
+                .body(errorBody(HttpStatus.BAD_REQUEST, "Validation failed", pathOf(request), fieldErrors));
+    }
+
+    private static String indexPrefix(ParameterErrors errors) {
+        return errors.getContainerIndex() == null ? "" : "[" + errors.getContainerIndex() + "].";
     }
 
     /**

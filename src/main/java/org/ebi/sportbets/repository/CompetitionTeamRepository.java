@@ -12,4 +12,6 @@ public interface CompetitionTeamRepository extends JpaRepository<CompetitionTeam
     boolean existsByCompetitionIdAndTeamId(Long competitionId, Long teamId);
 
     boolean existsByCompetitionId(Long competitionId);
+
+    boolean existsByTeamId(Long teamId);
 }

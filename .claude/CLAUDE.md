@@ -1,4 +1,4 @@
-
+    
 ## Stack
 - Java 25
 - Spring Boot 4.1.1

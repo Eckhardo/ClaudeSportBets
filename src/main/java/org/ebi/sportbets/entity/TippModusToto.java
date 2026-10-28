@@ -14,6 +14,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @Entity
 @Table(name = "tipp_modus_toto",
-        uniqueConstraints = @UniqueConstraint(name = "UniqueNameAndCommunity", columnNames = {"name", "fk_comm_id"}))
+        uniqueConstraints = @UniqueConstraint(name = "UniqueNameAndCommunityToto", columnNames = {"name", "fk_comm_id"}))
 public class TippModusToto extends TippModus {
 }

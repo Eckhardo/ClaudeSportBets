@@ -15,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @Entity
 @Table(name = "tipp_modus_result",
-        uniqueConstraints = @UniqueConstraint(name = "UniqueNameAndCommunity", columnNames = {"name", "fk_comm_id"}))
+        uniqueConstraints = @UniqueConstraint(name = "UniqueNameAndCommunityResult", columnNames = {"name", "fk_comm_id"}))
 public class TippModusResult extends TippModus {
 
     @Column(name = "tendency_points")
