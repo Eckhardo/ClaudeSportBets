@@ -10,4 +10,6 @@ public interface CompetitionFamilyRepository extends JpaRepository<CompetitionFa
     Optional<CompetitionFamily> findByName(String name);
 
     boolean existsByName(String name);
+
+    boolean existsByNameAndIdNot(String name, Long id);
 }

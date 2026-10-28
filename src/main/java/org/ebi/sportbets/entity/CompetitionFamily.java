@@ -1,10 +1,12 @@
 package org.ebi.sportbets.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +16,8 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -40,6 +44,10 @@ public class CompetitionFamily {
 
     @Column(name = "has_liga_modus", nullable = false)
     private boolean hasLigaModus;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "competitionFamily", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Competition> competitions = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_on", nullable = false, updatable = false)

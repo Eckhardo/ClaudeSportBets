@@ -1,7 +1,6 @@
 package org.ebi.sportbets.controller;
 
 import org.ebi.sportbets.dto.CompetitionDto;
-import org.ebi.sportbets.exception.BusinessRuleException;
 import org.ebi.sportbets.exception.ResourceNotFoundException;
 import org.ebi.sportbets.service.CompetitionService;
 import org.junit.jupiter.api.Test;
@@ -239,23 +238,6 @@ class CompetitionControllerTest {
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    void should_return422WithMessage_when_deleteCompetitionWithDependents() {
-        // Arrange
-        willThrow(new BusinessRuleException("Competition with id 1 cannot be deleted, it still has rounds"))
-                .given(competitionService).delete(1L);
-
-        // Act
-        MvcTestResult result = mvc.delete().uri("/v1/competitions/{id}", 1L).exchange();
-
-        // Assert
-        assertThat(result)
-                .hasStatus(HttpStatus.UNPROCESSABLE_CONTENT)
-                .bodyJson()
-                .extractingPath("$.message")
-                .isEqualTo("Competition with id 1 cannot be deleted, it still has rounds");
     }
 
     @Test

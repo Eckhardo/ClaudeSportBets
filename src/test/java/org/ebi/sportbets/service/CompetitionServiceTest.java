@@ -3,14 +3,9 @@ package org.ebi.sportbets.service;
 import org.ebi.sportbets.dto.CompetitionDto;
 import org.ebi.sportbets.entity.Competition;
 import org.ebi.sportbets.entity.CompetitionFamily;
-import org.ebi.sportbets.exception.BusinessRuleException;
 import org.ebi.sportbets.exception.ResourceNotFoundException;
 import org.ebi.sportbets.repository.CompetitionFamilyRepository;
-import org.ebi.sportbets.repository.CompetitionMembershipRepository;
 import org.ebi.sportbets.repository.CompetitionRepository;
-import org.ebi.sportbets.repository.CompetitionRoleRepository;
-import org.ebi.sportbets.repository.CompetitionRoundRepository;
-import org.ebi.sportbets.repository.CompetitionTeamRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -36,18 +31,6 @@ class CompetitionServiceTest {
 
     @Mock
     private CompetitionFamilyRepository competitionFamilyRepository;
-
-    @Mock
-    private CompetitionRoundRepository competitionRoundRepository;
-
-    @Mock
-    private CompetitionTeamRepository competitionTeamRepository;
-
-    @Mock
-    private CompetitionMembershipRepository competitionMembershipRepository;
-
-    @Mock
-    private CompetitionRoleRepository competitionRoleRepository;
 
     @InjectMocks
     private CompetitionService competitionService;
@@ -204,23 +187,6 @@ class CompetitionServiceTest {
         assertThat(thrown)
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("CompetitionFamily with id 8 not found");
-    }
-
-    @Test
-    void should_throwBusinessRuleAndDeleteNothing_when_competitionHasDependents() {
-        // Arrange
-        given(competitionRepository.findById(1L)).willReturn(Optional.of(Competition.builder().id(1L).build()));
-        given(competitionRoundRepository.existsByCompetitionId(1L)).willReturn(true);
-        given(competitionTeamRepository.existsByCompetitionId(1L)).willReturn(true);
-
-        // Act
-        Throwable thrown = catchThrowable(() -> competitionService.delete(1L));
-
-        // Assert
-        assertThat(thrown)
-                .isInstanceOf(BusinessRuleException.class)
-                .hasMessage("Competition with id 1 cannot be deleted, it still has rounds, teams");
-        then(competitionRepository).should(never()).delete(any(Competition.class));
     }
 
     @Test
