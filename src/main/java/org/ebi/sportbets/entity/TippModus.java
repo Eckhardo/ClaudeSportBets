@@ -1,6 +1,7 @@
 package org.ebi.sportbets.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -15,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import org.ebi.sportbets.enums.TippModusType;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -41,7 +43,8 @@ public abstract class TippModus {
     @Column(nullable = false)
     private String name;
 
-    private String type;
+    @Convert(converter = TippModusTypeConverter.class)
+    private TippModusType type;
 
     private Integer deadline;
 
