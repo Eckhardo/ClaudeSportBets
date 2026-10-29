@@ -21,10 +21,11 @@ CompetitionRound 1─* Spieltag, CompetitionGroup
 Spieltag 1─* Spiel, TippConfig
 Spiel 1─* Tipp, SpielFormula
 Team *─1 CompetitionTeam / Spiel (heimTeam, gastTeam)
-Community 1─* CommunityMembership (via FK), CompetitionMembership (via FK), TippModus, CommunityRole
+Community 1─* CommunityMembership, CompetitionMembership, TippModus, CommunityRole
 Tipper 1─* CommunityMembership, TipperRole
 CommunityMembership 1─* Tipp
 CompetitionMembership 1─* TippConfig
+TippModus 1─* Tipp, TippConfig
 Role 1─* TipperRole
 ```
 
@@ -147,7 +148,12 @@ A betting group of Tippers.
 | Field | Column | Notes |
 |---|---|---|
 | name, description | | nullable |
-| — | — | no collections mapped; children reference it via FK only |
+| communityMemberships | — | 1:n `CommunityMembership`, cascade |
+| competitionMemberships | — | 1:n `CompetitionMembership`, cascade |
+| tippModi | — | 1:n `TippModus` (polymorphic), cascade |
+| roles | — | 1:n `CommunityRole`, cascade |
+
+Deleting a Community removes its memberships, Tipps, TippConfigs, TippModi and CommunityRoles. `Tipper.defaultCommunityId` is not cleared, because it is a plain id.
 
 ### CommunityMembership — `community_membership`
 A Tipper's membership in a Community; owns that Tipper's Tipps.
@@ -197,6 +203,8 @@ Scoring mode defined by a Community. `@Inheritance(TABLE_PER_CLASS)` — no base
 | type | type | `org.ebi.sportbets.enums.TippModusType`, stored via `TippModusTypeConverter` |
 | deadline | deadline | `Integer`, nullable |
 | community | fk_comm_id | n:1, required |
+| tipps | — | 1:n `Tipp`, cascade |
+| tippConfigs | — | 1:n `TippConfig`, cascade |
 
 Subclasses:
 | Entity | Table | Extra fields | Expected `type` |

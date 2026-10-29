@@ -8,4 +8,6 @@ import java.util.List;
 public interface TippModusRepository extends JpaRepository<TippModus, Long> {
 
     List<TippModus> findByCommunityId(Long communityId);
+
+    List<TippModus> findByCommunityIdAndName(Long communityId, String name);
 }

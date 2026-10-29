@@ -10,4 +10,6 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     Optional<Community> findByName(String name);
 
     boolean existsByName(String name);
+
+    boolean existsByNameAndIdNot(String name, Long id);
 }
