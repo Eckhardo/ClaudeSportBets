@@ -157,6 +157,28 @@ class TipperControllerTest {
     }
 
     @Test
+    void should_reportPasswortErrorWithoutRejectedValue_when_createWithTooLongPasswort() {
+        // Arrange
+        String invalidRequest = """
+                {"username": "erika", "passwort": "%s"}
+                """.formatted("geheim".repeat(50));
+
+        // Act
+        MvcTestResult result = mvc.post().uri("/v1/tippers")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalidRequest)
+                .exchange();
+
+        // Assert
+        assertThat(result)
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson()
+                .extractingPath("$.fieldErrors[?(@.field == 'passwort')].rejectedValue")
+                .asArray()
+                .containsExactly((Object) null);
+    }
+
+    @Test
     void should_return409_when_createWithExistingUsername() {
         // Arrange
         given(tipperService.create(any(TipperDto.class)))

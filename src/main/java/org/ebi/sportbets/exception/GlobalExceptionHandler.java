@@ -21,11 +21,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Hidden
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    private static final Set<String> SENSITIVE_FIELDS = Set.of("passwort");
 
     @ExceptionHandler({ResourceNotFoundException.class, EntityNotFoundException.class})
     public ResponseEntity<ErrorResponse> handleNotFound(RuntimeException ex, HttpServletRequest request) {
@@ -67,7 +70,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         List<ErrorResponse.FieldErrorDto> fieldErrors = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> ErrorResponse.FieldErrorDto.builder()
                         .field(error.getField())
-                        .rejectedValue(error.getRejectedValue())
+                        .rejectedValue(rejectedValue(error.getField(), error.getRejectedValue()))
                         .message(error.getDefaultMessage())
                         .build())
                 .toList();
@@ -88,7 +91,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .flatMap(result -> result instanceof ParameterErrors errors
                         ? errors.getFieldErrors().stream().map(error -> ErrorResponse.FieldErrorDto.builder()
                                 .field(indexPrefix(errors) + error.getField())
-                                .rejectedValue(error.getRejectedValue())
+                                .rejectedValue(rejectedValue(error.getField(), error.getRejectedValue()))
                                 .message(error.getDefaultMessage())
                                 .build())
                         : result.getResolvableErrors().stream().map(error -> ErrorResponse.FieldErrorDto.builder()
@@ -99,6 +102,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
                 .toList();
         return ResponseEntity.badRequest()
                 .body(errorBody(HttpStatus.BAD_REQUEST, "Validation failed", pathOf(request), fieldErrors));
+    }
+
+    // Secrets must never be echoed back, even when they fail validation; nested paths are matched by their last segment
+    private static Object rejectedValue(String field, Object rejectedValue) {
+        String leafField = field.substring(field.lastIndexOf('.') + 1);
+        return SENSITIVE_FIELDS.contains(leafField) ? null : rejectedValue;
     }
 
     private static String indexPrefix(ParameterErrors errors) {
