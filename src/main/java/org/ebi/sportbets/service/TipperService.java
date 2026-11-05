@@ -8,6 +8,7 @@ import org.ebi.sportbets.exception.ResourceNotFoundException;
 import org.ebi.sportbets.repository.CommunityRepository;
 import org.ebi.sportbets.repository.CompetitionRepository;
 import org.ebi.sportbets.repository.TipperRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class TipperService {
     private final TipperRepository tipperRepository;
     private final CommunityRepository communityRepository;
     private final CompetitionRepository competitionRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public List<TipperDto> findAll() {
         return tipperRepository.findAll().stream()
@@ -82,7 +84,7 @@ public class TipperService {
         tipper.setFirstname(tipperDto.getFirstname());
         tipper.setLastname(tipperDto.getLastname());
         tipper.setEmail(tipperDto.getEmail());
-        tipper.setPasswort(tipperDto.getPasswort());
+        tipper.setPasswort(passwordEncoder.encode(tipperDto.getPasswort()));
         tipper.setPasswortHint(tipperDto.getPasswortHint());
         tipper.setCommunityAdmin(tipperDto.getCommunityAdmin());
         tipper.setCompetitionAdmin(tipperDto.getCompetitionAdmin());

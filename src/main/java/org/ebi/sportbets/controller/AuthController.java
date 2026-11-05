@@ -23,6 +23,7 @@ class AuthController {
     // Credentials go in the body, never in the URL, so they do not end up in access logs
     @PostMapping("/login")
     public ResponseEntity<UmsInfoDto> login(@Valid @RequestBody LoginRequestDto loginRequest) {
+        log.info("Login request: {}", loginRequest);
         UmsInfoDto umsInfo = authService.login(loginRequest);
         log.info("logged in tipper {}", umsInfo.getUserId());
         return ResponseEntity.ok(umsInfo);

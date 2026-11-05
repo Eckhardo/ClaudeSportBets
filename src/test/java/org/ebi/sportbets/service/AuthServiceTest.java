@@ -1,5 +1,6 @@
 package org.ebi.sportbets.service;
 
+import org.ebi.sportbets.config.PasswordEncoderConfig;
 import org.ebi.sportbets.dto.LoginRequestDto;
 import org.ebi.sportbets.dto.UmsInfoDto;
 import org.ebi.sportbets.entity.Community;
@@ -22,7 +23,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +53,9 @@ class AuthServiceTest {
     @Mock
     private CompetitionRepository competitionRepository;
 
+    @Spy
+    private PasswordEncoder passwordEncoder = new PasswordEncoderConfig().passwordEncoder();
+
     @InjectMocks
     private AuthService authService;
 
@@ -65,6 +71,11 @@ class AuthServiceTest {
                 .build();
     }
 
+    private void noMembershipsOrRoles() {
+        given(communityMembershipRepository.findByTipperId(3L)).willReturn(List.of());
+        given(tipperRoleRepository.findWithRoleByTipperId(3L)).willReturn(List.of());
+    }
+
     // The membership id is derived from the community id (community 2 -> membership 20) to keep the tests readable
     private static CommunityMembership membershipIn(Long communityId) {
         return CommunityMembership.builder()
@@ -74,7 +85,7 @@ class AuthServiceTest {
     }
 
     private static LoginRequestDto login(String username, String passwort) {
-        return LoginRequestDto.builder().username(username).passwort(passwort).build();
+        return LoginRequestDto.builder().userName(username).password(passwort).build();
     }
 
     @Test
@@ -210,6 +221,52 @@ class AuthServiceTest {
 
         // Assert
         assertThat(result.getDefaultCountry()).isEqualTo(Country.GERMANY);
+    }
+
+    @Test
+    void should_acceptPasswortAndKeepHash_when_storedPasswortIsEncoded() {
+        // Arrange
+        Tipper tipper = erika();
+        String hash = passwordEncoder.encode("geheim");
+        tipper.setPasswort(hash);
+        given(tipperRepository.findByUsername("erika")).willReturn(Optional.of(tipper));
+        noMembershipsOrRoles();
+
+        // Act
+        UmsInfoDto result = authService.login(login("erika", "geheim"));
+
+        // Assert
+        assertThat(result.isLoggedIn()).isTrue();
+        assertThat(tipper.getPasswort()).isEqualTo(hash);
+    }
+
+    @Test
+    void should_reEncodeLegacyPasswort_when_loginWithPlainTextPasswort() {
+        // Arrange
+        Tipper tipper = erika();
+        given(tipperRepository.findByUsername("erika")).willReturn(Optional.of(tipper));
+        noMembershipsOrRoles();
+
+        // Act
+        authService.login(login("erika", "geheim"));
+
+        // Assert
+        assertThat(tipper.getPasswort()).startsWith("{bcrypt}");
+        assertThat(passwordEncoder.matches("geheim", tipper.getPasswort())).isTrue();
+    }
+
+    @Test
+    void should_throwAuthenticationFailed_when_passwortIsWrongForEncodedPasswort() {
+        // Arrange
+        Tipper tipper = erika();
+        tipper.setPasswort(passwordEncoder.encode("geheim"));
+        given(tipperRepository.findByUsername("erika")).willReturn(Optional.of(tipper));
+
+        // Act
+        Throwable thrown = catchThrowable(() -> authService.login(login("erika", "falsch")));
+
+        // Assert
+        assertThat(thrown).isInstanceOf(AuthenticationFailedException.class);
     }
 
     @Test

@@ -32,6 +32,19 @@ public class CommunityService {
                 .orElseThrow(() -> new ResourceNotFoundException("Community", id));
     }
 
+    public List<CommunityDto> findCommunities(String username) {
+        return communityRepository.findCommunities(username).stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+
+    public CommunityDto findByName(String name) {
+        return communityRepository.findByName(name)
+                .map(this::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Community", name));
+    }
+
     @Transactional
     public CommunityDto create(CommunityDto communityDto) {
         if (communityRepository.existsByName(communityDto.getName())) {
@@ -80,4 +93,5 @@ public class CommunityService {
                 .createdOn(community.getCreatedOn())
                 .build();
     }
+
 }

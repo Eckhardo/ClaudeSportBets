@@ -1,7 +1,9 @@
 package org.ebi.sportbets.repository;
 
+import org.ebi.sportbets.entity.Community;
 import org.ebi.sportbets.entity.CommunityMembership;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,4 +17,5 @@ public interface CommunityMembershipRepository extends JpaRepository<CommunityMe
     Optional<CommunityMembership> findByCommunityIdAndTipperId(Long communityId, Long tipperId);
 
     boolean existsByCommunityIdAndTipperId(Long communityId, Long tipperId);
+
 }

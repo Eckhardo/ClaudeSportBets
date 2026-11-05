@@ -42,6 +42,7 @@ public class Tipper {
     private String email;
 
     @Column(nullable = false)
+ 
     private String passwort;
 
     @Column(name = "passwort_hint")

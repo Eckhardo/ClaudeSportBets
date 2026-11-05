@@ -13,6 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +36,9 @@ class TipperServiceTest {
 
     @Mock
     private CompetitionRepository competitionRepository;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private TipperService tipperService;
@@ -106,9 +110,10 @@ class TipperServiceTest {
     }
 
     @Test
-    void should_saveTipperWithPasswortIgnoringRequestId_when_usernameIsUnique() {
+    void should_saveTipperWithEncodedPasswortIgnoringRequestId_when_usernameIsUnique() {
         // Arrange
         given(tipperRepository.existsByUsername("erika")).willReturn(false);
+        given(passwordEncoder.encode("geheim")).willReturn("{bcrypt}hash-of-geheim");
         given(tipperRepository.save(any(Tipper.class))).willAnswer(invocation -> invocation.getArgument(0));
         ArgumentCaptor<Tipper> saved = ArgumentCaptor.forClass(Tipper.class);
 
@@ -119,7 +124,7 @@ class TipperServiceTest {
         then(tipperRepository).should().save(saved.capture());
         assertThat(saved.getValue())
                 .extracting(Tipper::getId, Tipper::getUsername, Tipper::getPasswort, Tipper::isCommunityAdmin)
-                .containsExactly(null, "erika", "geheim", true);
+                .containsExactly(null, "erika", "{bcrypt}hash-of-geheim", true);
     }
 
     @Test
@@ -184,6 +189,7 @@ class TipperServiceTest {
         given(tipperRepository.findById(3L)).willReturn(Optional.of(existing));
         given(tipperRepository.existsByUsernameAndIdNot("erika.m", 3L)).willReturn(false);
         given(communityRepository.existsById(7L)).willReturn(true);
+        given(passwordEncoder.encode("neu")).willReturn("{bcrypt}hash-of-neu");
 
         // Act
         TipperDto result = tipperService.update(3L, request);
@@ -193,7 +199,7 @@ class TipperServiceTest {
                 .extracting(TipperDto::getId, TipperDto::getUsername, TipperDto::getDefaultCommunityId,
                         TipperDto::getDefaultCompetitionId, TipperDto::getPasswort)
                 .containsExactly(3L, "erika.m", 7L, null, null);
-        assertThat(existing.getPasswort()).isEqualTo("neu");
+        assertThat(existing.getPasswort()).isEqualTo("{bcrypt}hash-of-neu");
     }
 
     @Test

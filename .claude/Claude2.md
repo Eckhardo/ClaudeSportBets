@@ -18,7 +18,7 @@ Base package: `org.ebi.sportbets`
 ## Coding Conventions
 - Use UUID for all entity primary keys
 - Use BigDecimal for monetary values, never double or float
-- All REST endpoints must be versioned under /api/v1/
+- All REST endpoints must be versioned under /bulitipper/api/v1/ (context path /bulitipper/api + /v1/<resource> in the controller)
 - DTOs are records where possible, otherwise use Lombok @Builder
 - Return ResponseEntity from controllers, not raw objects
 - Use AssertJ assertions in tests, not JUnit assertEquals

@@ -17,12 +17,12 @@ public class LoginRequestDto {
 
     @NotBlank
     @Size(max = 255)
-    private String username;
+    private String userName;
 
     // Accepted on input, never serialized into responses or logs
     @NotBlank
     @Size(max = 255)
     @ToString.Exclude
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private String passwort;
+    private String password;
 }

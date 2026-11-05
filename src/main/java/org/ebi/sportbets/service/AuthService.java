@@ -1,6 +1,7 @@
 package org.ebi.sportbets.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.ebi.sportbets.dto.LoginRequestDto;
 import org.ebi.sportbets.dto.UmsInfoDto;
 import org.ebi.sportbets.entity.CommunityMembership;
@@ -18,13 +19,13 @@ import org.ebi.sportbets.repository.CompetitionRepository;
 import org.ebi.sportbets.repository.TipperRepository;
 import org.ebi.sportbets.repository.TipperRoleRepository;
 import org.hibernate.Hibernate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -40,11 +41,19 @@ public class AuthService {
     private final CompetitionMembershipRepository competitionMembershipRepository;
     private final TipperRoleRepository tipperRoleRepository;
     private final CompetitionRepository competitionRepository;
+    private final PasswordEncoder passwordEncoder;
 
+    // Not read-only: a legacy plain text passwort is re-encoded on a successful login
+    @Transactional
     public UmsInfoDto login(LoginRequestDto loginRequest) {
-        Tipper tipper = tipperRepository.findByUsername(loginRequest.getUsername())
-                .filter(candidate -> passwortMatches(loginRequest.getPasswort(), candidate.getPasswort()))
+        Tipper tipper = tipperRepository.findByUsername(loginRequest.getUserName())
+                .filter(candidate -> candidate.getPasswort() != null
+                        && passwordEncoder.matches(loginRequest.getPassword(), candidate.getPasswort()))
                 .orElseThrow(() -> new AuthenticationFailedException(INVALID_CREDENTIALS));
+        if (passwordEncoder.upgradeEncoding(tipper.getPasswort())) {
+            // Managed entity: the new hash is flushed on commit, no save() needed
+            tipper.setPasswort(passwordEncoder.encode(loginRequest.getPassword()));
+        }
         return toUmsInfo(tipper);
     }
 
@@ -66,6 +75,7 @@ public class AuthService {
         // getId() on the lazy proxies does not trigger a load of the communities
         memberships.forEach(membership -> umsInfo.getTipperCommunities().add(membership.getCommunity().getId()));
         addAdminRights(umsInfo, tipper.getId());
+        log.info("umsInfo: {}", umsInfo);
         return umsInfo;
     }
 
@@ -123,12 +133,5 @@ public class AuthService {
                 default -> throw new IllegalStateException("Unknown role type " + role.getClass().getSimpleName());
             }
         }
-    }
-
-    // The legacy schema stores the passwort as plain text; compare in constant time to avoid timing leaks
-    private static boolean passwortMatches(String given, String stored) {
-        return stored != null && MessageDigest.isEqual(
-                given.getBytes(StandardCharsets.UTF_8),
-                stored.getBytes(StandardCharsets.UTF_8));
     }
 }

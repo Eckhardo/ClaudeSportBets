@@ -21,7 +21,7 @@ Sub-packages:
 - Always use DTOs in controllers — never expose entities directly.
 - All business logic lives in the service layer — keep controllers thin.
 - Centralised exception handling via `GlobalExceptionHandler`.
-- All endpoints prefixed with `/api/v1/`.
+- All endpoints are served under `/bulitipper/api/v1/` (see `rules/api-design.md`).
 
 ## Lombok
 - `@RequiredArgsConstructor` for injection everywhere (with `final` fields). No `@Autowired`.

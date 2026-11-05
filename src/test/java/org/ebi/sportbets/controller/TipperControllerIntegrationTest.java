@@ -28,6 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -48,6 +49,9 @@ class TipperControllerIntegrationTest {
 
     @Autowired
     private TipperRepository tipperRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private CommunityRepository communityRepository;
@@ -114,7 +118,8 @@ class TipperControllerIntegrationTest {
         assertThat(tipperRepository.findById(created.getId()))
                 .get()
                 .extracting(Tipper::getPasswort)
-                .isEqualTo("geheim");
+                .satisfies(stored -> assertThat(stored).startsWith("{bcrypt}"))
+                .satisfies(stored -> assertThat(passwordEncoder.matches("geheim", stored)).isTrue());
     }
 
     @Test
@@ -265,9 +270,9 @@ class TipperControllerIntegrationTest {
                 .jsonPath("$.username").isEqualTo("erika.m");
         assertThat(tipperRepository.findById(tipper.getId()))
                 .get()
-                .extracting(Tipper::getUsername, Tipper::getPasswort, Tipper::isCommunityAdmin,
-                        Tipper::getDefaultCommunityId)
-                .containsExactly("erika.m", "neu", true, community.getId());
+                .satisfies(saved -> assertThat(passwordEncoder.matches("neu", saved.getPasswort())).isTrue())
+                .extracting(Tipper::getUsername, Tipper::isCommunityAdmin, Tipper::getDefaultCommunityId)
+                .containsExactly("erika.m", true, community.getId());
     }
 
     @Test

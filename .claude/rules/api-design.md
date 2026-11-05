@@ -1,5 +1,9 @@
 # API Design Rules
-- All endpoints: `/bulitipper/api/v1/resource`.
+- All endpoints: `/bulitipper/api/v1/<resource>`.
+- The version lives **only** in the controller mapping:
+  - `application.properties`: `server.servlet.context-path=/bulitipper/api` (no version here).
+  - Controllers: `@RequestMapping("/v1/<resource>")`.
+- Tests address controllers as `/v1/<resource>`: `@WebMvcTest` has no context path; integration tests prepend `server.servlet.context-path`.
 
 ## HTTP Methods & Status Codes
 | Operation | Verb   | Success Response                  |

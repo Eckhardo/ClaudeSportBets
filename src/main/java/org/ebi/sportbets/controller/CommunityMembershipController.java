@@ -3,6 +3,7 @@ package org.ebi.sportbets.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ebi.sportbets.dto.CommunityDto;
 import org.ebi.sportbets.dto.CommunityMembershipDto;
 import org.ebi.sportbets.service.CommunityMembershipService;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/community-memberships")
+@RequestMapping("/v1/commMembs")
 class CommunityMembershipController {
 
     private final CommunityMembershipService communityMembershipService;
@@ -40,7 +41,7 @@ class CommunityMembershipController {
     public ResponseEntity<CommunityMembershipDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(communityMembershipService.findById(id));
     }
-
+  
     @PostMapping
     public ResponseEntity<CommunityMembershipDto> create(@Valid @RequestBody CommunityMembershipDto membershipDto) {
         CommunityMembershipDto created = communityMembershipService.create(membershipDto);
