@@ -29,7 +29,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "community_membership")
-public class CommunityMembership {
+public class    CommunityMembership {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

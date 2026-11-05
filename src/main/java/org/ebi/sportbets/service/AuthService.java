@@ -2,14 +2,28 @@ package org.ebi.sportbets.service;
 
 import lombok.RequiredArgsConstructor;
 import org.ebi.sportbets.dto.LoginRequestDto;
-import org.ebi.sportbets.dto.TipperDto;
+import org.ebi.sportbets.dto.UmsInfoDto;
+import org.ebi.sportbets.entity.CommunityMembership;
+import org.ebi.sportbets.entity.CommunityRole;
+import org.ebi.sportbets.entity.CompetitionMembership;
+import org.ebi.sportbets.entity.CompetitionRole;
+import org.ebi.sportbets.entity.Role;
+import org.ebi.sportbets.entity.Tipper;
+import org.ebi.sportbets.entity.TipperRole;
+import org.ebi.sportbets.enums.Country;
 import org.ebi.sportbets.exception.AuthenticationFailedException;
+import org.ebi.sportbets.repository.CommunityMembershipRepository;
+import org.ebi.sportbets.repository.CompetitionMembershipRepository;
+import org.ebi.sportbets.repository.CompetitionRepository;
 import org.ebi.sportbets.repository.TipperRepository;
+import org.ebi.sportbets.repository.TipperRoleRepository;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,14 +33,96 @@ public class AuthService {
     // Same message for unknown username and wrong passwort, so existing usernames cannot be probed
     private static final String INVALID_CREDENTIALS = "Invalid username or passwort";
 
-    private final TipperRepository tipperRepository;
-    private final TipperService tipperService;
+    private static final Country FALLBACK_COUNTRY = Country.GERMANY;
 
-    public TipperDto login(LoginRequestDto loginRequest) {
-        return tipperRepository.findByUsername(loginRequest.getUsername())
-                .filter(tipper -> passwortMatches(loginRequest.getPasswort(), tipper.getPasswort()))
-                .map(tipperService::toDto)
+    private final TipperRepository tipperRepository;
+    private final CommunityMembershipRepository communityMembershipRepository;
+    private final CompetitionMembershipRepository competitionMembershipRepository;
+    private final TipperRoleRepository tipperRoleRepository;
+    private final CompetitionRepository competitionRepository;
+
+    public UmsInfoDto login(LoginRequestDto loginRequest) {
+        Tipper tipper = tipperRepository.findByUsername(loginRequest.getUsername())
+                .filter(candidate -> passwortMatches(loginRequest.getPasswort(), candidate.getPasswort()))
                 .orElseThrow(() -> new AuthenticationFailedException(INVALID_CREDENTIALS));
+        return toUmsInfo(tipper);
+    }
+
+    private UmsInfoDto toUmsInfo(Tipper tipper) {
+        List<CommunityMembership> memberships = communityMembershipRepository.findByTipperId(tipper.getId());
+        Long defaultCommunityId = defaultCommunityId(tipper, memberships);
+        UmsInfoDto umsInfo = UmsInfoDto.builder()
+                .userId(tipper.getId())
+                .username(tipper.getUsername())
+                .loggedIn(true)
+                .commAdmin(tipper.isCommunityAdmin())
+                .compAdmin(tipper.isCompetitionAdmin())
+                .defaultCommunityId(defaultCommunityId)
+                .defaultCompetitionId(tipper.getDefaultCompetitionId())
+                .defaultCommMembId(defaultCommMembId(memberships, defaultCommunityId))
+                .defaultCompMembId(defaultCompMembId(defaultCommunityId, tipper.getDefaultCompetitionId()))
+                .defaultCountry(defaultCountry(tipper.getDefaultCompetitionId()))
+                .build();
+        // getId() on the lazy proxies does not trigger a load of the communities
+        memberships.forEach(membership -> umsInfo.getTipperCommunities().add(membership.getCommunity().getId()));
+        addAdminRights(umsInfo, tipper.getId());
+        return umsInfo;
+    }
+
+    // Without a stored default, the community of the first membership is used; the tipper itself is not changed
+    private static Long defaultCommunityId(Tipper tipper, List<CommunityMembership> memberships) {
+        if (tipper.getDefaultCommunityId() != null || memberships.isEmpty()) {
+            return tipper.getDefaultCommunityId();
+        }
+        return memberships.getFirst().getCommunity().getId();
+    }
+
+    // The tipper's own membership in the default community; null if the tipper is not (or no longer) a member
+    private static Long defaultCommMembId(List<CommunityMembership> memberships, Long defaultCommunityId) {
+        if (defaultCommunityId == null) {
+            return null;
+        }
+        return memberships.stream()
+                .filter(membership -> defaultCommunityId.equals(membership.getCommunity().getId()))
+                .map(CommunityMembership::getId)
+                .findFirst()
+                .orElse(null);
+    }
+
+    // The default community's participation in the default competition; null if it does not take part
+    private Long defaultCompMembId(Long defaultCommunityId, Long defaultCompetitionId) {
+        if (defaultCommunityId == null || defaultCompetitionId == null) {
+            return null;
+        }
+        return competitionMembershipRepository.findByCommunityIdAndCompetitionId(defaultCommunityId, defaultCompetitionId)
+                .map(CompetitionMembership::getId)
+                .orElse(null);
+    }
+
+    // default_competition_id has no FK, so a missing competition or an unknown country code falls back instead of failing the login
+    private Country defaultCountry(Long defaultCompetitionId) {
+        if (defaultCompetitionId == null) {
+            return FALLBACK_COUNTRY;
+        }
+        return competitionRepository.findById(defaultCompetitionId)
+                .map(competition -> Country.fromIsoCode(competition.getCompetitionFamily().getCountry()))
+                .orElse(FALLBACK_COUNTRY);
+    }
+
+    private void addAdminRights(UmsInfoDto umsInfo, Long tipperId) {
+        for (TipperRole tipperRole : tipperRoleRepository.findWithRoleByTipperId(tipperId)) {
+            // unproxy, because a proxy of the abstract Role would never match a subclass
+            Role role = (Role) Hibernate.unproxy(tipperRole.getRole());
+            switch (role) {
+                case CommunityRole communityRole when communityRole.getCommunity() != null ->
+                        umsInfo.getAdminCommunities().add(communityRole.getCommunity().getId());
+                case CompetitionRole competitionRole when competitionRole.getCompetition() != null ->
+                        umsInfo.getAdminCompetitions().add(competitionRole.getCompetition().getId());
+                // The FK columns are nullable in the legacy schema; such a role grants nothing
+                case CommunityRole _, CompetitionRole _ -> { }
+                default -> throw new IllegalStateException("Unknown role type " + role.getClass().getSimpleName());
+            }
+        }
     }
 
     // The legacy schema stores the passwort as plain text; compare in constant time to avoid timing leaks

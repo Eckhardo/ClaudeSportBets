@@ -1,7 +1,7 @@
 package org.ebi.sportbets.controller;
 
 import org.ebi.sportbets.dto.LoginRequestDto;
-import org.ebi.sportbets.dto.TipperDto;
+import org.ebi.sportbets.dto.UmsInfoDto;
 import org.ebi.sportbets.exception.AuthenticationFailedException;
 import org.ebi.sportbets.service.AuthService;
 import org.junit.jupiter.api.Test;
@@ -30,19 +30,16 @@ class AuthControllerTest {
     @MockitoBean
     private AuthService authService;
 
-    private static TipperDto erika() {
-        return TipperDto.builder()
-                .id(3L)
+    private static UmsInfoDto erika() {
+        return UmsInfoDto.builder()
+                .userId(3L)
                 .username("erika")
-                .firstname("Erika")
-                .lastname("Mustermann")
-                .communityAdmin(false)
-                .competitionAdmin(false)
+                .loggedIn(true)
                 .build();
     }
 
     @Test
-    void should_returnTipperDto_when_credentialsAreValid() {
+    void should_returnUmsInfo_when_credentialsAreValid() {
         // Arrange
         given(authService.login(any(LoginRequestDto.class))).willReturn(erika());
 
@@ -57,7 +54,7 @@ class AuthControllerTest {
                 .hasStatus(HttpStatus.OK)
                 .bodyJson()
                 .isLenientlyEqualTo("""
-                        {"id": 3, "username": "erika"}
+                        {"userId": 3, "username": "erika", "loggedIn": true}
                         """);
     }
 
