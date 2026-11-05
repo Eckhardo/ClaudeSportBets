@@ -95,7 +95,7 @@ public class TipperService {
     }
 
     // passwort is write-only in the DTO, so it is never mapped back
-    private TipperDto toDto(Tipper tipper) {
+    TipperDto toDto(Tipper tipper) {
         return TipperDto.builder()
                 .id(tipper.getId())
                 .username(tipper.getUsername())
