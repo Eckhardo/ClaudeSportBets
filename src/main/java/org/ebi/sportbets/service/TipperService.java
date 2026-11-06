@@ -30,6 +30,11 @@ public class TipperService {
                 .toList();
     }
 
+    public List<TipperDto> findByCommunityId(Long communityId) {
+        return tipperRepository.findByCommunityId(communityId).stream()
+                .map(this::toDto)
+                .toList();
+    }
     public TipperDto findById(Long id) {
         return tipperRepository.findById(id)
                 .map(this::toDto)
@@ -111,4 +116,5 @@ public class TipperService {
                 .defaultCompetitionId(tipper.getDefaultCompetitionId())
                 .build();
     }
+
 }

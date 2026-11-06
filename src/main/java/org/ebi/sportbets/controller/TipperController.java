@@ -3,17 +3,11 @@ package org.ebi.sportbets.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ebi.sportbets.dto.TippModusDto;
 import org.ebi.sportbets.dto.TipperDto;
 import org.ebi.sportbets.service.TipperService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -22,7 +16,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/tippers")
+@RequestMapping("/v1/tipper")
 class TipperController {
 
     private final TipperService tipperService;
@@ -38,7 +32,12 @@ class TipperController {
     public ResponseEntity<TipperDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(tipperService.findById(id));
     }
-
+    @GetMapping(params = "communityId")
+    public ResponseEntity<List<TipperDto>> getByCommunity(@RequestParam(required = false) Long communityId) {
+        List<TipperDto> tipper = tipperService.findByCommunityId(communityId);
+        log.info("get tipper {}", tipper.size());
+        return ResponseEntity.ok(tipper);
+    }
     @PostMapping
     public ResponseEntity<TipperDto> create(@Valid @RequestBody TipperDto tipperDto) {
         TipperDto created = tipperService.create(tipperDto);

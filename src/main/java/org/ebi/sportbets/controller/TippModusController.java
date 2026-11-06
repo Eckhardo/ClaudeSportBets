@@ -23,7 +23,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/tipp-modi")
+@RequestMapping("/v1/tippModus")
 class TippModusController {
 
     private final TippModusService tippModusService;

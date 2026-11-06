@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ebi.sportbets.dto.CommunityDto;
 import org.ebi.sportbets.dto.CommunityMembershipDto;
 import org.ebi.sportbets.service.CommunityMembershipService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -41,7 +43,7 @@ class CommunityMembershipController {
     public ResponseEntity<CommunityMembershipDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(communityMembershipService.findById(id));
     }
-  
+
     @PostMapping
     public ResponseEntity<CommunityMembershipDto> create(@Valid @RequestBody CommunityMembershipDto membershipDto) {
         CommunityMembershipDto created = communityMembershipService.create(membershipDto);

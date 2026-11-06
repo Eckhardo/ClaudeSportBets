@@ -23,7 +23,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/competition-memberships")
+@RequestMapping("/v1/compMembs")
 class CompetitionMembershipController {
 
     private final CompetitionMembershipService competitionMembershipService;
