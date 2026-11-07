@@ -33,6 +33,12 @@ public class SpieltagService {
                 .toList();
     }
 
+
+    public List<SpieltagDto> getAllForCompetition(Long competitionId) {
+        return spieltagRepository.findByCompetitionIdOrderBySpieltagNumberAsc(competitionId).stream()
+                .map(this::toDto)
+                .toList();
+    }
     public SpieltagDto findById(Long id) {
         return spieltagRepository.findById(id)
                 .map(this::toDto)
@@ -99,4 +105,5 @@ public class SpieltagService {
                 .createdOn(spieltag.getCreatedOn())
                 .build();
     }
+
 }

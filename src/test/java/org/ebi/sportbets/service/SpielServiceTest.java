@@ -100,7 +100,7 @@ class SpielServiceTest {
 
         // Assert
         assertThat(result)
-                .extracting(SpielDto::getHeimTeamId, SpielDto::getGastTeamId, SpielDto::getSpieltagId, SpielDto::getCompetitionGroupId)
+                .extracting(SpielDto::getHeimTeamAcronym, SpielDto::getGastTeamAcronym, SpielDto::getSpieltagId, SpielDto::getCompetitionGroupId)
                 .containsOnlyNulls();
     }
 
@@ -150,7 +150,7 @@ class SpielServiceTest {
 
         // Assert
         assertThat(result)
-                .extracting(SpielDto::getId, SpielDto::getHeimTeamId, SpielDto::getGastTeamId,
+                .extracting(SpielDto::getId, SpielDto::getHeimTeamAcronym, SpielDto::getGastTeamAcronym,
                         SpielDto::getSpieltagId, SpielDto::getCompetitionGroupId)
                 .containsExactly(11L, 1L, 2L, 8L, null);
     }

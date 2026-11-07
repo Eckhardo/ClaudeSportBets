@@ -139,7 +139,7 @@ class SpielControllerIntegrationTest {
                 .getResponseBody();
         assertThat(created).isNotNull();
         assertThat(created)
-                .extracting(SpielDto::getHeimTeamId, SpielDto::getGastTeamId, SpielDto::getSpieltagId,
+                .extracting(SpielDto::getHeimTeamAcronym, SpielDto::getGastTeamAcronym, SpielDto::getSpieltagId,
                         SpielDto::getCompetitionGroupId, SpielDto::getAnpfiffDate)
                 .containsExactly(bayern.getId(), dortmund.getId(), spieltag.getId(), group.getId(), ANPFIFF);
         assertThat(created.getCreatedOn()).isNotNull();

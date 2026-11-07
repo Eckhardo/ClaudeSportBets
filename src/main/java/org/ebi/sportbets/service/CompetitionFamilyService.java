@@ -2,10 +2,12 @@ package org.ebi.sportbets.service;
 
 import lombok.RequiredArgsConstructor;
 import org.ebi.sportbets.dto.CompetitionFamilyDto;
+import org.ebi.sportbets.entity.Competition;
 import org.ebi.sportbets.entity.CompetitionFamily;
 import org.ebi.sportbets.exception.DuplicateResourceException;
 import org.ebi.sportbets.exception.ResourceNotFoundException;
 import org.ebi.sportbets.repository.CompetitionFamilyRepository;
+import org.ebi.sportbets.repository.CompetitionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,8 @@ import java.util.List;
 public class CompetitionFamilyService {
 
     private final CompetitionFamilyRepository competitionFamilyRepository;
+    private final CompetitionService competitionService;
+    private final CompetitionRepository competitionRepository;
 
     public List<CompetitionFamilyDto> findAll() {
         return competitionFamilyRepository.findAll().stream()
@@ -28,6 +32,14 @@ public class CompetitionFamilyService {
         return competitionFamilyRepository.findById(id)
                 .map(this::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("CompetitionFamily", id));
+    }
+
+    public CompetitionFamilyDto findByByCompetitionId(Long competitionId) {
+        Competition comp = competitionRepository.findById(competitionId).orElseThrow(() -> new ResourceNotFoundException("Competition", competitionId));
+
+        return competitionFamilyRepository.findById(comp.getCompetitionFamily().getId())
+                .map(this::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("CompetitionFamily by competitionId", competitionId));
     }
 
     @Transactional
@@ -86,4 +98,5 @@ public class CompetitionFamilyService {
                 .createdOn(competitionFamily.getCreatedOn())
                 .build();
     }
+
 }

@@ -4,16 +4,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ebi.sportbets.dto.CompetitionFamilyDto;
+import org.ebi.sportbets.dto.SpieltagDto;
 import org.ebi.sportbets.service.CompetitionFamilyService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -22,7 +16,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/competition-families")
+@RequestMapping("/v1/families")
 class CompetitionFamilyController {
 
     private final CompetitionFamilyService competitionFamilyService;
@@ -38,7 +32,13 @@ class CompetitionFamilyController {
     public ResponseEntity<CompetitionFamilyDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(competitionFamilyService.findById(id));
     }
+    @GetMapping(params = "competitionId")
+    public ResponseEntity<CompetitionFamilyDto> findByCompId(@RequestParam() Long competitionId) {
 
+        CompetitionFamilyDto family = competitionFamilyService.findByByCompetitionId(competitionId);
+        log.info("get family");
+        return ResponseEntity.ok(family);
+    }
     @PostMapping
     public ResponseEntity<CompetitionFamilyDto> create(@Valid @RequestBody CompetitionFamilyDto competitionFamilyDto) {
         CompetitionFamilyDto created = competitionFamilyService.create(competitionFamilyDto);

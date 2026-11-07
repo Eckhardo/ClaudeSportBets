@@ -23,7 +23,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/spiele")
+@RequestMapping("/v1/matches")
 class SpielController {
 
     private final SpielService spielService;

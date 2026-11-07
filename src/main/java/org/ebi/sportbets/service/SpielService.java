@@ -72,7 +72,7 @@ public class SpielService {
     }
 
     private void ensureDifferentTeams(SpielDto spielDto) {
-        if (spielDto.getHeimTeamId() != null && spielDto.getHeimTeamId().equals(spielDto.getGastTeamId())) {
+        if (spielDto.getHeimTeamAcronym() != null && spielDto.getHeimTeamAcronym().equals(spielDto.getGastTeamAcronym())) {
             throw new BusinessRuleException("Heim team and Gast team must be different");
         }
     }
@@ -109,6 +109,8 @@ public class SpielService {
                 .stattgefunden(spiel.isStattgefunden())
                 .heimTeamId(spiel.getHeimTeam() == null ? null : spiel.getHeimTeam().getId())
                 .gastTeamId(spiel.getGastTeam() == null ? null : spiel.getGastTeam().getId())
+                .heimTeamAcronym(spiel.getHeimTeam() == null ? null : spiel.getHeimTeam().getAcronym())
+                .gastTeamAcronym(spiel.getGastTeam() == null ? null : spiel.getGastTeam().getAcronym())
                 .spieltagId(spiel.getSpieltag() == null ? null : spiel.getSpieltag().getId())
                 .competitionGroupId(spiel.getCompetitionGroup() == null ? null : spiel.getCompetitionGroup().getId())
                 .createdOn(spiel.getCreatedOn())

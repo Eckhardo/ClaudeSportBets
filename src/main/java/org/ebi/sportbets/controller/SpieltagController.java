@@ -23,12 +23,12 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/spieltage")
+@RequestMapping("/v1/matchdays")
 class SpieltagController {
 
     private final SpieltagService spieltagService;
 
-    @GetMapping
+    @GetMapping(params = "competitionRoundId")
     public ResponseEntity<List<SpieltagDto>> get(@RequestParam(required = false) Long competitionRoundId) {
         List<SpieltagDto> spieltage = competitionRoundId == null
                 ? spieltagService.findAll()
@@ -36,7 +36,12 @@ class SpieltagController {
         log.info("get spieltage {}", spieltage.size());
         return ResponseEntity.ok(spieltage);
     }
-
+    @GetMapping(params = "competitionId")
+    public ResponseEntity<List<SpieltagDto>> findAllForCompetition(@RequestParam() Long competitionId) {
+        List<SpieltagDto> matchdays = spieltagService.getAllForCompetition(competitionId);
+        log.info("get spieltage {}", matchdays.size());
+        return ResponseEntity.ok(matchdays);
+    }
     @GetMapping("/{id}")
     public ResponseEntity<SpieltagDto> getById(@PathVariable Long id) {
         return ResponseEntity.ok(spieltagService.findById(id));

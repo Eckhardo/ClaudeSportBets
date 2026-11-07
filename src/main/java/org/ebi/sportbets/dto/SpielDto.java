@@ -36,8 +36,10 @@ public class SpielDto {
     private Boolean stattgefunden;
 
     private Long heimTeamId;
-
     private Long gastTeamId;
+    private String heimTeamAcronym;
+
+    private String gastTeamAcronym;
 
     private Long spieltagId;
 

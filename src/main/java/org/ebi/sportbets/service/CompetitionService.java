@@ -2,6 +2,7 @@ package org.ebi.sportbets.service;
 
 import lombok.RequiredArgsConstructor;
 import org.ebi.sportbets.dto.CompetitionDto;
+import org.ebi.sportbets.dto.CompetitionRoundDto;
 import org.ebi.sportbets.entity.Competition;
 import org.ebi.sportbets.entity.CompetitionFamily;
 import org.ebi.sportbets.exception.ResourceNotFoundException;
@@ -26,6 +27,11 @@ public class CompetitionService {
                 .toList();
     }
 
+    public List<CompetitionDto> findByCompetitionFamilyId(Long competitionFamilyId) {
+        return competitionRepository.findByCompetitionFamilyIdOrderByCreatedOnAsc(competitionFamilyId).stream()
+                .map(this::toDto)
+                .toList();
+    }
     public CompetitionDto findById(Long id) {
         return competitionRepository.findById(id)
                 .map(this::toDto)

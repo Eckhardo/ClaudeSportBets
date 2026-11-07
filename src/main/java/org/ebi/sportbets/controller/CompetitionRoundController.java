@@ -23,7 +23,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/v1/competition-rounds")
+@RequestMapping("/v1/rounds")
 class CompetitionRoundController {
 
     private final CompetitionRoundService competitionRoundService;
@@ -33,7 +33,7 @@ class CompetitionRoundController {
         List<CompetitionRoundDto> rounds = competitionId == null
                 ? competitionRoundService.findAll()
                 : competitionRoundService.findByCompetitionId(competitionId);
-        log.info("get comp rounds {}", rounds.size());
+        log.info("get competition rounds {}", rounds.getFirst());
         return ResponseEntity.ok(rounds);
     }
 
