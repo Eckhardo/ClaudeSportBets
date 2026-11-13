@@ -109,6 +109,7 @@ public class CompetitionTeamService {
                 .id(competitionTeam.getId())
                 // getId() on the lazy proxies does not trigger a load of community or competition
                 .teamId(competitionTeam.getTeam().getId())
+                .teamAcronym(competitionTeam.getTeam().getAcronym())
                 .competitionId(competitionTeam.getCompetition().getId())
                 .createdOn(competitionTeam.getCreatedOn())
                 .build();

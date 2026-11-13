@@ -21,6 +21,8 @@ public class CompetitionTeamDto {
 
     @NotNull
     private Long teamId;
+    @NotNull
+    private String teamAcronym;
 
     private LocalDateTime createdOn;
 }
