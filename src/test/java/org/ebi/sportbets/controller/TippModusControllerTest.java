@@ -60,7 +60,7 @@ class TippModusControllerTest {
                 TippModusTotoDto.builder().id(4L).name("Toto").type("TotoTipp").communityId(7L).build()));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/tipp-modi").param("communityId", "7").exchange();
+        MvcTestResult result = mvc.get().uri("/v1/tippModus").param("communityId", "7").exchange();
 
         // Assert
         assertThat(result)
@@ -77,7 +77,7 @@ class TippModusControllerTest {
         given(tippModusService.find(null)).willReturn(List.of());
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/tipp-modi").exchange();
+        MvcTestResult result = mvc.get().uri("/v1/tippModus").exchange();
 
         // Assert
         assertThat(result)
@@ -92,7 +92,7 @@ class TippModusControllerTest {
         given(tippModusService.findById(3L)).willReturn(punkte());
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/tipp-modi/{id}", 3L).exchange();
+        MvcTestResult result = mvc.get().uri("/v1/tippModus/{id}", 3L).exchange();
 
         // Assert
         assertThat(result)
@@ -109,7 +109,7 @@ class TippModusControllerTest {
         given(tippModusService.findById(42L)).willThrow(new ResourceNotFoundException("TippModus", 42L));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/tipp-modi/{id}", 42L).exchange();
+        MvcTestResult result = mvc.get().uri("/v1/tippModus/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
@@ -121,7 +121,7 @@ class TippModusControllerTest {
         given(tippModusService.create(any(TippModusDto.class))).willReturn(punkte());
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/tipp-modi")
+        MvcTestResult result = mvc.post().uri("/v1/tippModus")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -129,7 +129,7 @@ class TippModusControllerTest {
         // Assert
         assertThat(result)
                 .hasStatus(HttpStatus.CREATED)
-                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/tipp-modi/3")
+                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/tippModus/3")
                 .bodyJson()
                 .isLenientlyEqualTo("""
                         {"id": 3, "modus": "POINT", "name": "Punkte"}
@@ -143,7 +143,7 @@ class TippModusControllerTest {
         ArgumentCaptor<TippModusDto> request = ArgumentCaptor.forClass(TippModusDto.class);
 
         // Act
-        mvc.post().uri("/v1/tipp-modi")
+        mvc.post().uri("/v1/tippModus")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -164,7 +164,7 @@ class TippModusControllerTest {
                 """;
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/tipp-modi")
+        MvcTestResult result = mvc.post().uri("/v1/tippModus")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRequest)
                 .exchange();
@@ -186,7 +186,7 @@ class TippModusControllerTest {
                 """;
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/tipp-modi")
+        MvcTestResult result = mvc.post().uri("/v1/tippModus")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRequest)
                 .exchange();
@@ -202,7 +202,7 @@ class TippModusControllerTest {
                 .willThrow(new DuplicateResourceException("PointTipp with name Punkte already exists in Community 7"));
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/tipp-modi")
+        MvcTestResult result = mvc.post().uri("/v1/tippModus")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -221,7 +221,7 @@ class TippModusControllerTest {
         given(tippModusService.update(eq(3L), any(TippModusDto.class))).willReturn(punkte());
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/tipp-modi/{id}", 3L)
+        MvcTestResult result = mvc.put().uri("/v1/tippModus/{id}", 3L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -242,7 +242,7 @@ class TippModusControllerTest {
                 .willThrow(new BusinessRuleException("TippModus 3 is a TotoTipp and cannot be changed to a PointTipp"));
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/tipp-modi/{id}", 3L)
+        MvcTestResult result = mvc.put().uri("/v1/tippModus/{id}", 3L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -262,7 +262,7 @@ class TippModusControllerTest {
                 .willThrow(new ResourceNotFoundException("TippModus", 42L));
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/tipp-modi/{id}", 42L)
+        MvcTestResult result = mvc.put().uri("/v1/tippModus/{id}", 42L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -277,7 +277,7 @@ class TippModusControllerTest {
         Long id = 3L;
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/tipp-modi/{id}", id).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/tippModus/{id}", id).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
@@ -289,7 +289,7 @@ class TippModusControllerTest {
         willThrow(new ResourceNotFoundException("TippModus", 42L)).given(tippModusService).delete(42L);
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/tipp-modi/{id}", 42L).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/tippModus/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);

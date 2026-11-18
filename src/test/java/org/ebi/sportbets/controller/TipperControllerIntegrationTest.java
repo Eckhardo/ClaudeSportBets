@@ -79,7 +79,7 @@ class TipperControllerIntegrationTest {
     @BeforeEach
     void setUp() {
         client = WebTestClient.bindToServer()
-                .baseUrl("http://localhost:" + port + contextPath + "/v1/tippers")
+                .baseUrl("http://localhost:" + port + contextPath + "/v1/tipper")
                 .build();
     }
 
@@ -106,7 +106,7 @@ class TipperControllerIntegrationTest {
         // Assert
         TipperDto created = response
                 .expectStatus().isCreated()
-                .expectHeader().valueMatches(HttpHeaders.LOCATION, ".*" + contextPath + "/v1/tippers/\\d+")
+                .expectHeader().valueMatches(HttpHeaders.LOCATION, ".*" + contextPath + "/v1/tipper/\\d+")
                 .expectBody(TipperDto.class)
                 .returnResult()
                 .getResponseBody();
@@ -154,7 +154,7 @@ class TipperControllerIntegrationTest {
         response.expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.fieldErrors.length()").isEqualTo(7)
-                .jsonPath("$.path").isEqualTo(contextPath + "/v1/tippers");
+                .jsonPath("$.path").isEqualTo(contextPath + "/v1/tipper");
     }
 
     @Test

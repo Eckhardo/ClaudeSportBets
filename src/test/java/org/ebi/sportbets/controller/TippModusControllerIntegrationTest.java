@@ -99,7 +99,7 @@ class TippModusControllerIntegrationTest {
     @BeforeEach
     void setUp() {
         client = WebTestClient.bindToServer()
-                .baseUrl("http://localhost:" + port + contextPath + "/v1/tipp-modi")
+                .baseUrl("http://localhost:" + port + contextPath + "/v1/tippModus")
                 .build();
         community = communityRepository.save(Community.builder().name("Stammtisch").build());
     }
@@ -133,7 +133,7 @@ class TippModusControllerIntegrationTest {
         // Assert
         TippModusDto created = response
                 .expectStatus().isCreated()
-                .expectHeader().valueMatches(HttpHeaders.LOCATION, ".*" + contextPath + "/v1/tipp-modi/\\d+")
+                .expectHeader().valueMatches(HttpHeaders.LOCATION, ".*" + contextPath + "/v1/tippModus/\\d+")
                 .expectBody(TippModusDto.class)
                 .returnResult()
                 .getResponseBody();
@@ -192,7 +192,7 @@ class TippModusControllerIntegrationTest {
         response.expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.fieldErrors.length()").isEqualTo(4)
-                .jsonPath("$.path").isEqualTo(contextPath + "/v1/tipp-modi");
+                .jsonPath("$.path").isEqualTo(contextPath + "/v1/tippModus");
     }
 
     @Test

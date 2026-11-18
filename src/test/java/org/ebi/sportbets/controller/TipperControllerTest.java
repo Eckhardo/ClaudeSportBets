@@ -57,7 +57,7 @@ class TipperControllerTest {
         given(tipperService.findAll()).willReturn(List.of(erika()));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/tippers").exchange();
+        MvcTestResult result = mvc.get().uri("/v1/tipper").exchange();
 
         // Assert
         assertThat(result)
@@ -74,7 +74,7 @@ class TipperControllerTest {
         given(tipperService.findById(3L)).willReturn(erika());
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/tippers/{id}", 3L).exchange();
+        MvcTestResult result = mvc.get().uri("/v1/tipper/{id}", 3L).exchange();
 
         // Assert
         assertThat(result)
@@ -89,7 +89,7 @@ class TipperControllerTest {
         given(tipperService.findById(42L)).willThrow(new ResourceNotFoundException("Tipper", 42L));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/tippers/{id}", 42L).exchange();
+        MvcTestResult result = mvc.get().uri("/v1/tipper/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
@@ -101,7 +101,7 @@ class TipperControllerTest {
         given(tipperService.create(any(TipperDto.class))).willReturn(erika());
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/tippers")
+        MvcTestResult result = mvc.post().uri("/v1/tipper")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -109,7 +109,7 @@ class TipperControllerTest {
         // Assert
         assertThat(result)
                 .hasStatus(HttpStatus.CREATED)
-                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/tippers/3")
+                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/tipper/3")
                 .bodyJson()
                 .isLenientlyEqualTo("""
                         {"id": 3, "username": "erika"}
@@ -123,7 +123,7 @@ class TipperControllerTest {
         ArgumentCaptor<TipperDto> request = ArgumentCaptor.forClass(TipperDto.class);
 
         // Act
-        mvc.post().uri("/v1/tippers")
+        mvc.post().uri("/v1/tipper")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -141,7 +141,7 @@ class TipperControllerTest {
                 """;
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/tippers")
+        MvcTestResult result = mvc.post().uri("/v1/tipper")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRequest)
                 .exchange();
@@ -164,7 +164,7 @@ class TipperControllerTest {
                 """.formatted("geheim".repeat(50));
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/tippers")
+        MvcTestResult result = mvc.post().uri("/v1/tipper")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRequest)
                 .exchange();
@@ -185,7 +185,7 @@ class TipperControllerTest {
                 .willThrow(new DuplicateResourceException("Tipper with username erika already exists"));
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/tippers")
+        MvcTestResult result = mvc.post().uri("/v1/tipper")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -204,7 +204,7 @@ class TipperControllerTest {
         given(tipperService.update(eq(3L), any(TipperDto.class))).willReturn(erika());
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/tippers/{id}", 3L)
+        MvcTestResult result = mvc.put().uri("/v1/tipper/{id}", 3L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -225,7 +225,7 @@ class TipperControllerTest {
                 .willThrow(new ResourceNotFoundException("Tipper", 42L));
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/tippers/{id}", 42L)
+        MvcTestResult result = mvc.put().uri("/v1/tipper/{id}", 42L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -240,7 +240,7 @@ class TipperControllerTest {
         Long id = 3L;
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/tippers/{id}", id).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/tipper/{id}", id).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
@@ -252,7 +252,7 @@ class TipperControllerTest {
         willThrow(new ResourceNotFoundException("Tipper", 42L)).given(tipperService).delete(42L);
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/tippers/{id}", 42L).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/tipper/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
