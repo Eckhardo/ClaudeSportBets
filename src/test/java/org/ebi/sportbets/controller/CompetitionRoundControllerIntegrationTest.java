@@ -57,7 +57,7 @@ class CompetitionRoundControllerIntegrationTest {
     @BeforeEach
     void setUp() {
         client = WebTestClient.bindToServer()
-                .baseUrl("http://localhost:" + port + contextPath + "/v1/competition-rounds")
+                .baseUrl("http://localhost:" + port + contextPath + "/v1/rounds")
                 .build();
         CompetitionFamily family = competitionFamilyRepository.save(CompetitionFamily.builder()
                 .name("Bundesliga")
@@ -88,7 +88,7 @@ class CompetitionRoundControllerIntegrationTest {
         // Assert
         CompetitionRoundDto created = response
                 .expectStatus().isCreated()
-                .expectHeader().valueMatches(HttpHeaders.LOCATION, ".*" + contextPath + "/v1/competition-rounds/\\d+")
+                .expectHeader().valueMatches(HttpHeaders.LOCATION, ".*" + contextPath + "/v1/rounds/\\d+")
                 .expectBody(CompetitionRoundDto.class)
                 .returnResult()
                 .getResponseBody();
@@ -116,7 +116,7 @@ class CompetitionRoundControllerIntegrationTest {
         response.expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.fieldErrors.length()").isEqualTo(4)
-                .jsonPath("$.path").isEqualTo(contextPath + "/v1/competition-rounds");
+                .jsonPath("$.path").isEqualTo(contextPath + "/v1/rounds");
     }
 
     @Test

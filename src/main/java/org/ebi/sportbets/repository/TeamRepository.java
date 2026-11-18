@@ -1,8 +1,12 @@
 package org.ebi.sportbets.repository;
 
+import jakarta.persistence.QueryHint;
 import org.ebi.sportbets.entity.Team;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface TeamRepository extends JpaRepository<Team, Long> {
@@ -18,4 +22,11 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     boolean existsByNameAndIdNot(String name, Long id);
 
     boolean existsByAcronymAndIdNot(String acronym, Long id);
+
+    @Query(" select t from Team t where t.hasClub=true")
+    List<Team> findAllClubTeams();
+
+    @Query(" select t from Team t where t.hasClub=false")
+    List<Team> findAllNationTeams();
+
 }

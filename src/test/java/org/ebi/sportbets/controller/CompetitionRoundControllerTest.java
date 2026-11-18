@@ -51,7 +51,7 @@ class   CompetitionRoundControllerTest {
         given(competitionRoundService.findAll()).willReturn(List.of(hinrunde()));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/competition-rounds").exchange();
+        MvcTestResult result = mvc.get().uri("/v1/rounds").exchange();
 
         // Assert
         assertThat(result)
@@ -68,7 +68,7 @@ class   CompetitionRoundControllerTest {
         given(competitionRoundService.findByCompetitionId(3L)).willReturn(List.of(hinrunde()));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/competition-rounds?competitionId={id}", 3L).exchange();
+        MvcTestResult result = mvc.get().uri("/v1/rounds?competitionId={id}", 3L).exchange();
 
         // Assert
         assertThat(result)
@@ -85,7 +85,7 @@ class   CompetitionRoundControllerTest {
         given(competitionRoundService.findById(5L)).willReturn(hinrunde());
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/competition-rounds/{id}", 5L).exchange();
+        MvcTestResult result = mvc.get().uri("/v1/rounds/{id}", 5L).exchange();
 
         // Assert
         assertThat(result)
@@ -102,7 +102,7 @@ class   CompetitionRoundControllerTest {
         given(competitionRoundService.findById(42L)).willThrow(new ResourceNotFoundException("CompetitionRound", 42L));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/competition-rounds/{id}", 42L).exchange();
+        MvcTestResult result = mvc.get().uri("/v1/rounds/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
@@ -114,7 +114,7 @@ class   CompetitionRoundControllerTest {
         given(competitionRoundService.create(any(CompetitionRoundDto.class))).willReturn(hinrunde());
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/competition-rounds")
+        MvcTestResult result = mvc.post().uri("/v1/rounds")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -122,7 +122,7 @@ class   CompetitionRoundControllerTest {
         // Assert
         assertThat(result)
                 .hasStatus(HttpStatus.CREATED)
-                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/competition-rounds/5")
+                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/rounds/5")
                 .bodyJson()
                 .isLenientlyEqualTo("""
                         {"id": 5, "name": "Hinrunde", "competitionId": 3}
@@ -137,7 +137,7 @@ class   CompetitionRoundControllerTest {
                 """;
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/competition-rounds")
+        MvcTestResult result = mvc.post().uri("/v1/rounds")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRequest)
                 .exchange();
@@ -158,7 +158,7 @@ class   CompetitionRoundControllerTest {
                 .willThrow(new ResourceNotFoundException("Competition", 3L));
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/competition-rounds")
+        MvcTestResult result = mvc.post().uri("/v1/rounds")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -174,7 +174,7 @@ class   CompetitionRoundControllerTest {
                 .willThrow(new DuplicateResourceException("CompetitionRound with round number 1 already exists for Competition 3"));
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/competition-rounds")
+        MvcTestResult result = mvc.post().uri("/v1/rounds")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -193,7 +193,7 @@ class   CompetitionRoundControllerTest {
         given(competitionRoundService.update(eq(5L), any(CompetitionRoundDto.class))).willReturn(hinrunde());
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/competition-rounds/{id}", 5L)
+        MvcTestResult result = mvc.put().uri("/v1/rounds/{id}", 5L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -215,7 +215,7 @@ class   CompetitionRoundControllerTest {
                 """;
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/competition-rounds/{id}", 5L)
+        MvcTestResult result = mvc.put().uri("/v1/rounds/{id}", 5L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRequest)
                 .exchange();
@@ -236,7 +236,7 @@ class   CompetitionRoundControllerTest {
                 .willThrow(new ResourceNotFoundException("CompetitionRound", 42L));
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/competition-rounds/{id}", 42L)
+        MvcTestResult result = mvc.put().uri("/v1/rounds/{id}", 42L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -251,7 +251,7 @@ class   CompetitionRoundControllerTest {
         Long id = 5L;
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/competition-rounds/{id}", id).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/rounds/{id}", id).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
@@ -263,7 +263,7 @@ class   CompetitionRoundControllerTest {
         willThrow(new ResourceNotFoundException("CompetitionRound", 42L)).given(competitionRoundService).delete(42L);
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/competition-rounds/{id}", 42L).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/rounds/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);

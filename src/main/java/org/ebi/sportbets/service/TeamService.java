@@ -29,6 +29,18 @@ public class TeamService {
                 .toList();
     }
 
+    public List<TeamDto> getAllClubTeams() {
+      return teamRepository.findAllClubTeams().stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+
+    public List<TeamDto> getAllNationTeams() {
+       return teamRepository.findAllNationTeams().stream()
+                .map(this::toDto)
+                .toList();
+    }
     public TeamDto findById(Long id) {
         return teamRepository.findById(id)
                 .map(this::toDto)

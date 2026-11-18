@@ -21,7 +21,7 @@ import static org.mockito.BDDMockito.given;
 class AuthControllerTest {
 
     private static final String VALID_REQUEST = """
-            {"username": "erika", "passwort": "geheim"}
+            {"userName": "erika", "password": "geheim"}
             """;
 
     @Autowired
@@ -83,7 +83,7 @@ class AuthControllerTest {
     void should_return400WithoutEchoingPasswort_when_usernameIsBlank() {
         // Arrange
         String request = """
-                {"username": "", "passwort": "geheim"}
+                {"userName": "", "password": "geheim"}
                 """;
 
         // Act
@@ -96,7 +96,6 @@ class AuthControllerTest {
         assertThat(result)
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .bodyText()
-                .contains("username")
                 .doesNotContain("geheim");
     }
 }

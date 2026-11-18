@@ -1,6 +1,7 @@
 package org.ebi.sportbets.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.ebi.sportbets.dto.SpielDto;
 import org.ebi.sportbets.entity.Spiel;
 import org.ebi.sportbets.exception.BusinessRuleException;
@@ -15,10 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class SpielService {
+
 
     private final SpielRepository spielRepository;
     private final TeamRepository teamRepository;
@@ -46,9 +49,12 @@ public class SpielService {
     @Transactional
     public SpielDto create(SpielDto spielDto) {
         ensureDifferentTeams(spielDto);
+        log.info("Creating spiel {}", spielDto);
         // id and createdOn from the request are ignored; both are generated on insert
         Spiel spiel = Spiel.builder().build();
+
         applyChanges(spiel, spielDto);
+
         return toDto(spielRepository.save(spiel));
     }
 
@@ -72,7 +78,7 @@ public class SpielService {
     }
 
     private void ensureDifferentTeams(SpielDto spielDto) {
-        if (spielDto.getHeimTeamAcronym() != null && spielDto.getHeimTeamAcronym().equals(spielDto.getGastTeamAcronym())) {
+        if (spielDto.getHeimTeamId() != null && spielDto.getHeimTeamId().equals(spielDto.getGastTeamId())) {
             throw new BusinessRuleException("Heim team and Gast team must be different");
         }
     }

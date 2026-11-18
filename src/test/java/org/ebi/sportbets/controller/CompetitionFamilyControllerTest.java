@@ -46,7 +46,7 @@ class CompetitionFamilyControllerTest {
                 .build()));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/competition-families").exchange();
+        MvcTestResult result = mvc.get().uri("/v1/families").exchange();
 
         // Assert
         assertThat(result)
@@ -66,7 +66,7 @@ class CompetitionFamilyControllerTest {
                 .build());
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/competition-families/{id}", 7L).exchange();
+        MvcTestResult result = mvc.get().uri("/v1/families/{id}", 7L).exchange();
 
         // Assert
         assertThat(result)
@@ -83,7 +83,7 @@ class CompetitionFamilyControllerTest {
         given(competitionFamilyService.findById(42L)).willThrow(new ResourceNotFoundException("CompetitionFamily", 42L));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/competition-families/{id}", 42L).exchange();
+        MvcTestResult result = mvc.get().uri("/v1/families/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
@@ -101,7 +101,7 @@ class CompetitionFamilyControllerTest {
                 .build());
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/competition-families")
+        MvcTestResult result = mvc.post().uri("/v1/families")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -109,7 +109,7 @@ class CompetitionFamilyControllerTest {
         // Assert
         assertThat(result)
                 .hasStatus(HttpStatus.CREATED)
-                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/competition-families/7")
+                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/families/7")
                 .bodyJson()
                 .isLenientlyEqualTo("""
                         {"id": 7, "name": "Bundesliga", "country": "Deutschland"}
@@ -124,7 +124,7 @@ class CompetitionFamilyControllerTest {
                 """;
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/competition-families")
+        MvcTestResult result = mvc.post().uri("/v1/families")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRequest)
                 .exchange();
@@ -145,7 +145,7 @@ class CompetitionFamilyControllerTest {
                 .willThrow(new DuplicateResourceException("CompetitionFamily with name Bundesliga already exists"));
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/competition-families")
+        MvcTestResult result = mvc.post().uri("/v1/families")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -170,7 +170,7 @@ class CompetitionFamilyControllerTest {
                 .build());
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/competition-families/{id}", 7L)
+        MvcTestResult result = mvc.put().uri("/v1/families/{id}", 7L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -192,7 +192,7 @@ class CompetitionFamilyControllerTest {
                 """;
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/competition-families/{id}", 7L)
+        MvcTestResult result = mvc.put().uri("/v1/families/{id}", 7L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRequest)
                 .exchange();
@@ -213,7 +213,7 @@ class CompetitionFamilyControllerTest {
                 .willThrow(new ResourceNotFoundException("CompetitionFamily", 42L));
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/competition-families/{id}", 42L)
+        MvcTestResult result = mvc.put().uri("/v1/families/{id}", 42L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -228,7 +228,7 @@ class CompetitionFamilyControllerTest {
         Long id = 7L;
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/competition-families/{id}", id).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/families/{id}", id).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
@@ -240,7 +240,7 @@ class CompetitionFamilyControllerTest {
         willThrow(new ResourceNotFoundException("CompetitionFamily", 42L)).given(competitionFamilyService).delete(42L);
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/competition-families/{id}", 42L).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/families/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);

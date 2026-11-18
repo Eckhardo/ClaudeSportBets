@@ -153,13 +153,15 @@ class TeamControllerIntegrationTest {
     }
 
     @Test
-    void should_returnAllTeams_when_getAll() {
+    void should_returnAllTeams_when_getAllClubTeams() {
         // Arrange
         saveTeam("FC Bayern München", "FCB");
         saveTeam("Borussia Dortmund", "BVB");
 
         // Act
-        WebTestClient.ResponseSpec response = client.get().exchange();
+        WebTestClient.ResponseSpec response = client.get()
+                .uri(uriBuilder -> uriBuilder.queryParam("hasClubs", true).build())
+                .exchange();
 
         // Assert
         response.expectStatus().isOk()

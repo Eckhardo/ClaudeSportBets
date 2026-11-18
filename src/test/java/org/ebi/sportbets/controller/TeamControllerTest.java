@@ -41,12 +41,12 @@ class TeamControllerTest {
     }
 
     @Test
-    void should_returnTeamDtos_when_getTeams() {
+    void should_returnTeamDtos_when_getAllClubTeams() {
         // Arrange
-        given(teamService.findAll()).willReturn(List.of(bayern()));
+        given(teamService.getAllClubTeams()).willReturn(List.of(bayern()));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/teams").exchange();
+        MvcTestResult result = mvc.get().uri("/v1/teams?hasClubs=true").exchange();
 
         // Assert
         assertThat(result)
