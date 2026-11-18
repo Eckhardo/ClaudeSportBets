@@ -40,12 +40,12 @@ class SpieltagControllerTest {
     }
 
     @Test
-    void should_returnAllSpieltagDtos_when_getSpieltageWithoutFilter() {
+    void should_returnAllSpieltagDtos_when_getSpieltageForCompetition() {
         // Arrange
-        given(spieltagService.findAll()).willReturn(List.of(spieltag1()));
+        given(spieltagService.getAllForCompetition(5L)).willReturn(List.of(spieltag1()));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/spieltage").exchange();
+        MvcTestResult result = mvc.get().uri("/v1/matchdays?competitionId={id}", 5L).exchange();
 
         // Assert
         assertThat(result)
@@ -62,7 +62,7 @@ class SpieltagControllerTest {
         given(spieltagService.findByCompetitionRoundId(5L)).willReturn(List.of(spieltag1()));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/spieltage?competitionRoundId={id}", 5L).exchange();
+        MvcTestResult result = mvc.get().uri("/v1/matchdays?competitionRoundId={id}", 5L).exchange();
 
         // Assert
         assertThat(result)
@@ -79,7 +79,7 @@ class SpieltagControllerTest {
         given(spieltagService.findById(42L)).willThrow(new ResourceNotFoundException("Spieltag", 42L));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/spieltage/{id}", 42L).exchange();
+        MvcTestResult result = mvc.get().uri("/v1/matchdays/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
@@ -91,7 +91,7 @@ class SpieltagControllerTest {
         given(spieltagService.create(any(SpieltagDto.class))).willReturn(spieltag1());
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/spieltage")
+        MvcTestResult result = mvc.post().uri("/v1/matchdays")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -99,7 +99,7 @@ class SpieltagControllerTest {
         // Assert
         assertThat(result)
                 .hasStatus(HttpStatus.CREATED)
-                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/spieltage/8")
+                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/matchdays/8")
                 .bodyJson()
                 .isLenientlyEqualTo("""
                         {"id": 8, "spieltagNumber": 1}
@@ -114,7 +114,7 @@ class SpieltagControllerTest {
                 """;
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/spieltage")
+        MvcTestResult result = mvc.post().uri("/v1/matchdays")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRequest)
                 .exchange();
@@ -135,7 +135,7 @@ class SpieltagControllerTest {
                 .willThrow(new DuplicateResourceException("Spieltag with number 1 already exists for CompetitionRound 5"));
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/spieltage")
+        MvcTestResult result = mvc.post().uri("/v1/matchdays")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -150,7 +150,7 @@ class SpieltagControllerTest {
         given(spieltagService.update(eq(8L), any(SpieltagDto.class))).willReturn(spieltag1());
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/spieltage/{id}", 8L)
+        MvcTestResult result = mvc.put().uri("/v1/matchdays/{id}", 8L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -171,7 +171,7 @@ class SpieltagControllerTest {
                 .willThrow(new ResourceNotFoundException("Spieltag", 42L));
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/spieltage/{id}", 42L)
+        MvcTestResult result = mvc.put().uri("/v1/matchdays/{id}", 42L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -186,7 +186,7 @@ class SpieltagControllerTest {
         Long id = 8L;
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/spieltage/{id}", id).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/matchdays/{id}", id).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
@@ -198,7 +198,7 @@ class SpieltagControllerTest {
         willThrow(new ResourceNotFoundException("Spieltag", 42L)).given(spieltagService).delete(42L);
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/spieltage/{id}", 42L).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/matchdays/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);

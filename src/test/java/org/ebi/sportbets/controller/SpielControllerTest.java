@@ -55,7 +55,7 @@ class SpielControllerTest {
         given(spielService.findAll()).willReturn(List.of(spiel1()));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/spiele").exchange();
+        MvcTestResult result = mvc.get().uri("/v1/matches").exchange();
 
         // Assert
         assertThat(result)
@@ -72,7 +72,7 @@ class SpielControllerTest {
         given(spielService.findBySpieltagId(8L)).willReturn(List.of(spiel1()));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/spiele?spieltagId={id}", 8L).exchange();
+        MvcTestResult result = mvc.get().uri("/v1/matches?spieltagId={id}", 8L).exchange();
 
         // Assert
         assertThat(result)
@@ -89,7 +89,7 @@ class SpielControllerTest {
         given(spielService.findById(42L)).willThrow(new ResourceNotFoundException("Spiel", 42L));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/spiele/{id}", 42L).exchange();
+        MvcTestResult result = mvc.get().uri("/v1/matches/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
@@ -101,7 +101,7 @@ class SpielControllerTest {
         given(spielService.create(any(SpielDto.class))).willReturn(spiel1());
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/spiele")
+        MvcTestResult result = mvc.post().uri("/v1/matches")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -109,7 +109,7 @@ class SpielControllerTest {
         // Assert
         assertThat(result)
                 .hasStatus(HttpStatus.CREATED)
-                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/spiele/11")
+                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/matches/11")
                 .bodyJson()
                 .isLenientlyEqualTo("""
                         {"id": 11, "heimTore": 2, "gastTore": 1}
@@ -124,7 +124,7 @@ class SpielControllerTest {
                 """;
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/spiele")
+        MvcTestResult result = mvc.post().uri("/v1/matches")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRequest)
                 .exchange();
@@ -145,7 +145,7 @@ class SpielControllerTest {
                 .willThrow(new BusinessRuleException("Heim team and Gast team must be different"));
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/spiele")
+        MvcTestResult result = mvc.post().uri("/v1/matches")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -164,7 +164,7 @@ class SpielControllerTest {
         given(spielService.update(eq(11L), any(SpielDto.class))).willReturn(spiel1());
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/spiele/{id}", 11L)
+        MvcTestResult result = mvc.put().uri("/v1/matches/{id}", 11L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -184,7 +184,7 @@ class SpielControllerTest {
         given(spielService.update(eq(42L), any(SpielDto.class))).willThrow(new ResourceNotFoundException("Spiel", 42L));
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/spiele/{id}", 42L)
+        MvcTestResult result = mvc.put().uri("/v1/matches/{id}", 42L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -199,7 +199,7 @@ class SpielControllerTest {
         Long id = 11L;
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/spiele/{id}", id).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/matches/{id}", id).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
@@ -211,7 +211,7 @@ class SpielControllerTest {
         willThrow(new ResourceNotFoundException("Spiel", 42L)).given(spielService).delete(42L);
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/spiele/{id}", 42L).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/matches/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);

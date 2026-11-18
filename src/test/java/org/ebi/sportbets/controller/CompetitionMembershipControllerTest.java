@@ -46,7 +46,7 @@ class CompetitionMembershipControllerTest {
         given(competitionMembershipService.find(null, null)).willReturn(List.of(membership()));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/competition-memberships").exchange();
+        MvcTestResult result = mvc.get().uri("/v1/compMembs").exchange();
 
         // Assert
         assertThat(result)
@@ -63,7 +63,7 @@ class CompetitionMembershipControllerTest {
         given(competitionMembershipService.find(2L, 4L)).willReturn(List.of(membership()));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/competition-memberships?communityId=2&competitionId=4").exchange();
+        MvcTestResult result = mvc.get().uri("/v1/compMembs?communityId=2&competitionId=4").exchange();
 
         // Assert
         assertThat(result)
@@ -81,7 +81,7 @@ class CompetitionMembershipControllerTest {
                 .willThrow(new ResourceNotFoundException("CompetitionMembership", 42L));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/competition-memberships/{id}", 42L).exchange();
+        MvcTestResult result = mvc.get().uri("/v1/compMembs/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
@@ -93,7 +93,7 @@ class CompetitionMembershipControllerTest {
         given(competitionMembershipService.create(any(CompetitionMembershipDto.class))).willReturn(membership());
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/competition-memberships")
+        MvcTestResult result = mvc.post().uri("/v1/compMembs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -101,7 +101,7 @@ class CompetitionMembershipControllerTest {
         // Assert
         assertThat(result)
                 .hasStatus(HttpStatus.CREATED)
-                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/competition-memberships/7")
+                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/compMembs/7")
                 .bodyJson()
                 .isLenientlyEqualTo("""
                         {"id": 7, "communityId": 2, "competitionId": 4}
@@ -114,7 +114,7 @@ class CompetitionMembershipControllerTest {
         String invalidRequest = "{}";
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/competition-memberships")
+        MvcTestResult result = mvc.post().uri("/v1/compMembs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRequest)
                 .exchange();
@@ -135,7 +135,7 @@ class CompetitionMembershipControllerTest {
                 .willThrow(new DuplicateResourceException("Community 2 already takes part in Competition 4"));
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/competition-memberships")
+        MvcTestResult result = mvc.post().uri("/v1/compMembs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -151,7 +151,7 @@ class CompetitionMembershipControllerTest {
                 .willReturn(membership());
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/competition-memberships/{id}", 7L)
+        MvcTestResult result = mvc.put().uri("/v1/compMembs/{id}", 7L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -173,7 +173,7 @@ class CompetitionMembershipControllerTest {
                         "CompetitionMembership 7 has TippConfigs and cannot be moved to another Community or Competition"));
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/competition-memberships/{id}", 7L)
+        MvcTestResult result = mvc.put().uri("/v1/compMembs/{id}", 7L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -189,7 +189,7 @@ class CompetitionMembershipControllerTest {
                 .willThrow(new ResourceNotFoundException("CompetitionMembership", 42L));
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/competition-memberships/{id}", 42L)
+        MvcTestResult result = mvc.put().uri("/v1/compMembs/{id}", 42L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -204,7 +204,7 @@ class CompetitionMembershipControllerTest {
         Long id = 7L;
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/competition-memberships/{id}", id).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/compMembs/{id}", id).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
@@ -217,7 +217,7 @@ class CompetitionMembershipControllerTest {
                 .given(competitionMembershipService).delete(42L);
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/competition-memberships/{id}", 42L).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/compMembs/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);

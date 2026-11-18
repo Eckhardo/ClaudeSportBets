@@ -60,7 +60,7 @@ class SpieltagControllerIntegrationTest {
     @BeforeEach
     void setUp() {
         client = WebTestClient.bindToServer()
-                .baseUrl("http://localhost:" + port + contextPath + "/v1/spieltage")
+                .baseUrl("http://localhost:" + port + contextPath + "/v1/matchdays")
                 .build();
         CompetitionFamily family = competitionFamilyRepository.save(CompetitionFamily.builder()
                 .name("Bundesliga")
@@ -97,7 +97,7 @@ class SpieltagControllerIntegrationTest {
         // Assert
         SpieltagDto created = response
                 .expectStatus().isCreated()
-                .expectHeader().valueMatches(HttpHeaders.LOCATION, ".*" + contextPath + "/v1/spieltage/\\d+")
+                .expectHeader().valueMatches(HttpHeaders.LOCATION, ".*" + contextPath + "/v1/matchdays/\\d+")
                 .expectBody(SpieltagDto.class)
                 .returnResult()
                 .getResponseBody();
@@ -125,7 +125,7 @@ class SpieltagControllerIntegrationTest {
         response.expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.fieldErrors.length()").isEqualTo(2)
-                .jsonPath("$.path").isEqualTo(contextPath + "/v1/spieltage");
+                .jsonPath("$.path").isEqualTo(contextPath + "/v1/matchdays");
     }
 
     @Test
@@ -172,7 +172,9 @@ class SpieltagControllerIntegrationTest {
         saveSpieltag(2, round);
 
         // Act
-        WebTestClient.ResponseSpec response = client.get().exchange();
+        WebTestClient.ResponseSpec response = client.get()
+                .uri(uriBuilder -> uriBuilder.queryParam("competitionRoundId", round.getId()).build())
+                .exchange();
 
         // Assert
         response.expectStatus().isOk()

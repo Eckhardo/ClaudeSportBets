@@ -73,7 +73,7 @@ class SpielControllerIntegrationTest {
     @BeforeEach
     void setUp() {
         client = WebTestClient.bindToServer()
-                .baseUrl("http://localhost:" + port + contextPath + "/v1/spiele")
+                .baseUrl("http://localhost:" + port + contextPath + "/v1/matches")
                 .build();
         CompetitionFamily family = competitionFamilyRepository.save(CompetitionFamily.builder()
                 .name("Bundesliga")
@@ -133,7 +133,7 @@ class SpielControllerIntegrationTest {
         // Assert
         SpielDto created = response
                 .expectStatus().isCreated()
-                .expectHeader().valueMatches(HttpHeaders.LOCATION, ".*" + contextPath + "/v1/spiele/\\d+")
+                .expectHeader().valueMatches(HttpHeaders.LOCATION, ".*" + contextPath + "/v1/matches/\\d+")
                 .expectBody(SpielDto.class)
                 .returnResult()
                 .getResponseBody();
@@ -141,7 +141,7 @@ class SpielControllerIntegrationTest {
         assertThat(created)
                 .extracting(SpielDto::getHeimTeamAcronym, SpielDto::getGastTeamAcronym, SpielDto::getSpieltagId,
                         SpielDto::getCompetitionGroupId, SpielDto::getAnpfiffDate)
-                .containsExactly(bayern.getId(), dortmund.getId(), spieltag.getId(), group.getId(), ANPFIFF);
+                .containsExactly(bayern.getAcronym(), dortmund.getAcronym(), spieltag.getId(), group.getId(), ANPFIFF);
         assertThat(created.getCreatedOn()).isNotNull();
         assertThat(spielRepository.existsById(created.getId())).isTrue();
     }
@@ -181,7 +181,7 @@ class SpielControllerIntegrationTest {
         response.expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.fieldErrors.length()").isEqualTo(4)
-                .jsonPath("$.path").isEqualTo(contextPath + "/v1/spiele");
+                .jsonPath("$.path").isEqualTo(contextPath + "/v1/matches");
     }
 
     @Test

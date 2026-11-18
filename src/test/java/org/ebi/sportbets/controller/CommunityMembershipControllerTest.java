@@ -46,7 +46,7 @@ class CommunityMembershipControllerTest {
         given(communityMembershipService.find(null, null)).willReturn(List.of(membership()));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/community-memberships").exchange();
+        MvcTestResult result = mvc.get().uri("/v1/commMembs").exchange();
 
         // Assert
         assertThat(result)
@@ -63,7 +63,7 @@ class CommunityMembershipControllerTest {
         given(communityMembershipService.find(2L, 3L)).willReturn(List.of(membership()));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/community-memberships?communityId=2&tipperId=3").exchange();
+        MvcTestResult result = mvc.get().uri("/v1/commMembs?communityId=2&tipperId=3").exchange();
 
         // Assert
         assertThat(result)
@@ -81,7 +81,7 @@ class CommunityMembershipControllerTest {
                 .willThrow(new ResourceNotFoundException("CommunityMembership", 42L));
 
         // Act
-        MvcTestResult result = mvc.get().uri("/v1/community-memberships/{id}", 42L).exchange();
+        MvcTestResult result = mvc.get().uri("/v1/commMembs/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
@@ -93,7 +93,7 @@ class CommunityMembershipControllerTest {
         given(communityMembershipService.create(any(CommunityMembershipDto.class))).willReturn(membership());
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/community-memberships")
+        MvcTestResult result = mvc.post().uri("/v1/commMembs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -101,7 +101,7 @@ class CommunityMembershipControllerTest {
         // Assert
         assertThat(result)
                 .hasStatus(HttpStatus.CREATED)
-                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/community-memberships/7")
+                .hasHeader(HttpHeaders.LOCATION, "http://localhost/v1/commMembs/7")
                 .bodyJson()
                 .isLenientlyEqualTo("""
                         {"id": 7, "communityId": 2, "tipperId": 3}
@@ -114,7 +114,7 @@ class CommunityMembershipControllerTest {
         String invalidRequest = "{}";
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/community-memberships")
+        MvcTestResult result = mvc.post().uri("/v1/commMembs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(invalidRequest)
                 .exchange();
@@ -135,7 +135,7 @@ class CommunityMembershipControllerTest {
                 .willThrow(new DuplicateResourceException("Tipper 3 is already a member of Community 2"));
 
         // Act
-        MvcTestResult result = mvc.post().uri("/v1/community-memberships")
+        MvcTestResult result = mvc.post().uri("/v1/commMembs")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -150,7 +150,7 @@ class CommunityMembershipControllerTest {
         given(communityMembershipService.update(eq(7L), any(CommunityMembershipDto.class))).willReturn(membership());
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/community-memberships/{id}", 7L)
+        MvcTestResult result = mvc.put().uri("/v1/commMembs/{id}", 7L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -171,7 +171,7 @@ class CommunityMembershipControllerTest {
                 .willThrow(new BusinessRuleException("CommunityMembership 7 has Tipps and cannot be moved to another Community"));
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/community-memberships/{id}", 7L)
+        MvcTestResult result = mvc.put().uri("/v1/commMembs/{id}", 7L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -187,7 +187,7 @@ class CommunityMembershipControllerTest {
                 .willThrow(new ResourceNotFoundException("CommunityMembership", 42L));
 
         // Act
-        MvcTestResult result = mvc.put().uri("/v1/community-memberships/{id}", 42L)
+        MvcTestResult result = mvc.put().uri("/v1/commMembs/{id}", 42L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(VALID_REQUEST)
                 .exchange();
@@ -202,7 +202,7 @@ class CommunityMembershipControllerTest {
         Long id = 7L;
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/community-memberships/{id}", id).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/commMembs/{id}", id).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NO_CONTENT);
@@ -215,7 +215,7 @@ class CommunityMembershipControllerTest {
                 .given(communityMembershipService).delete(42L);
 
         // Act
-        MvcTestResult result = mvc.delete().uri("/v1/community-memberships/{id}", 42L).exchange();
+        MvcTestResult result = mvc.delete().uri("/v1/commMembs/{id}", 42L).exchange();
 
         // Assert
         assertThat(result).hasStatus(HttpStatus.NOT_FOUND);
