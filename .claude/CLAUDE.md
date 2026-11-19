@@ -23,6 +23,12 @@ Sub-packages:
 - Centralised exception handling via `GlobalExceptionHandler`.
 - All endpoints are served under `/bulitipper/api/v1/` (see `rules/api-design.md`).
 
+
+## Things to Avoid
+- No System.out.println — use SLF4J logger
+- No wildcard imports
+- No magic strings — use constants or enums
+
 ## Lombok
 - `@RequiredArgsConstructor` for injection everywhere (with `final` fields). No `@Autowired`.
 - Entities: `@Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor`.
