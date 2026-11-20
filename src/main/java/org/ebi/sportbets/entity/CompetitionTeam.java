@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.ebi.sportbets.dto.CompetitionDto;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -42,4 +43,10 @@ public class CompetitionTeam {
     @CreationTimestamp
     @Column(name = "created_on", nullable = false, updatable = false)
     private LocalDateTime createdOn;
+
+    public CompetitionTeam(Competition comp, Team team) {
+        this.competition = comp;
+        this.team = team;
+
+    }
 }

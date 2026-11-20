@@ -1,6 +1,7 @@
 package org.ebi.sportbets.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.ebi.sportbets.dto.CompetitionTeamDto;
 import org.ebi.sportbets.entity.Competition;
 import org.ebi.sportbets.entity.CompetitionTeam;
@@ -13,8 +14,10 @@ import org.ebi.sportbets.repository.TeamRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -108,11 +111,27 @@ public class CompetitionTeamService {
         return CompetitionTeamDto.builder()
                 .id(competitionTeam.getId())
                 // getId() on the lazy proxies does not trigger a load of community or competition
-                .teamId(competitionTeam.getTeam().getId())
+
                 .teamAcronym(competitionTeam.getTeam().getAcronym())
+                .teamId(competitionTeam.getTeam().getId())
                 .competitionId(competitionTeam.getCompetition().getId())
                 .createdOn(competitionTeam.getCreatedOn())
                 .build();
+    }
+
+    public List<List<CompetitionTeamDto>> findAllRegisteredAndNonRegisteredTeams(Long compId) {
+        Competition competition = findCompetition(compId);
+        final boolean hasClubs = competition.getCompetitionFamily().isHasClubs();
+        List<List<CompetitionTeamDto>> result = new ArrayList<>();
+        List<CompetitionTeamDto> registeredCompTeams = competitionTeamRepository.findByCompetitionId(compId).stream().map(this::toDto).toList();
+        log.info("Competition teams list found: {}", registeredCompTeams.size());
+        result.add(registeredCompTeams);
+        List<Team> unregisteredTeams = competitionTeamRepository.findUnregisteredTeams(compId, hasClubs);
+
+        List<CompetitionTeamDto> unregDtos = unregisteredTeams.stream().map(team -> new CompetitionTeam(competition, team)).map(this::toDto).toList();
+        log.info("Unregstered Competition teams list found: {}", unregDtos.size());
+        result.add(unregDtos);
+        return result;
     }
 
 }
